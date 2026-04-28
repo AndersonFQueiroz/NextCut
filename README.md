@@ -1,4 +1,3 @@
-````md id="91nx42"
 # ✂️ NextCut — Fila Virtual para Barbearia
 
 <div align="center">
@@ -371,4 +370,4 @@ Este projeto pode ser adaptado para fins acadêmicos, comerciais ou evolutivos c
 ## “Sua barbearia merece mais que papel.”
 
 </div>
-```
+
