@@ -282,7 +282,7 @@ flowchart LR
 
 ---
 
-# � Documentação e Planejamento
+# ✔ 📄 Documentação e Planejamento
 
 Veja os arquivos de especificação para detalhes:
 
