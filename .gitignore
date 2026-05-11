@@ -2,6 +2,7 @@
 target/
 *.class
 .m2/
+dependency-reduced-pom.xml
 
 # Environment
 .env

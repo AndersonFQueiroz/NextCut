@@ -5,6 +5,7 @@ Este documento cobre a atividade #5 da Semana 1: configurar branches, regras de 
 ## Branches principais
 
 - `main`: branch estável do projeto. Recebe apenas código revisado por pull request.
+- `develop`: branch de integração para juntar features antes de promover para `main`.
 - `feature/<responsavel>-<descricao>`: branch de funcionalidade ou tarefa.
 - `fix/<responsavel>-<descricao>`: branch para correções pequenas.
 - `docs/<responsavel>-<descricao>`: branch para alterações apenas em documentação.
@@ -14,6 +15,8 @@ Exemplos:
 ```bash
 git checkout main
 git pull origin main
+git checkout develop
+git pull origin develop
 git checkout -b feature/anderson-backend-base
 ```
 
