@@ -217,6 +217,8 @@ sequenceDiagram
 
 # 🌐 Endpoints da API
 
+> Estado atual: backend base criado com Javalin e fila em memória. A integração JDBC/Supabase fica para depois da atividade #7, quando as tabelas estiverem prontas.
+
 ## Cliente
 
 ```http
@@ -239,6 +241,25 @@ POST /admin/toggle
 
 ```http
 /ws/queue
+```
+
+## Rodar o backend localmente
+
+Pré-requisitos:
+
+* Java 17+
+* Maven 3.9+
+
+```bash
+cd backend
+mvn test
+mvn exec:java -Dexec.mainClass="com.nextcut.app.Main"
+```
+
+Por padrão, a API sobe em:
+
+```http
+http://localhost:7070
 ```
 
 ---
@@ -289,6 +310,7 @@ Veja os arquivos de especificação para detalhes:
 * [agents.md](./agents.md) — Guia mestre para agentes de IA e developers
 * [specs.md](./specs.md) — Especificações técnicas
 * [requirements.md](./requirements.md) — Requisitos funcionais
+* [docs/git-workflow.md](./docs/git-workflow.md) — Fluxo Git, branches e checklist de PR
 
 ---
 
@@ -370,4 +392,3 @@ Este projeto pode ser adaptado para fins acadêmicos, comerciais ou evolutivos c
 ## “Sua barbearia merece mais que papel.”
 
 </div>
-
