@@ -1,0 +1,19 @@
+# Java / Maven
+target/
+*.class
+.m2/
+dependency-reduced-pom.xml
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDEs
+.idea/
+.vscode/
+.agents/
+
+# OS
+.DS_Store
+Thumbs.db
