@@ -1,7 +1,7 @@
 package com.nextcut.config;
 
 public record AppProperties(int port) {
-    private static final int DEFAULT_PORT = 7070;
+    private static final int DEFAULT_PORT = 8080;
 
     public static AppProperties fromEnvironment() {
         var rawPort = System.getenv("PORT");

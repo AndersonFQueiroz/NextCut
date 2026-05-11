@@ -259,7 +259,7 @@ mvn exec:java -Dexec.mainClass="com.nextcut.app.Main"
 Por padrão, a API sobe em:
 
 ```http
-http://localhost:7070
+http://localhost:8080
 ```
 
 ---

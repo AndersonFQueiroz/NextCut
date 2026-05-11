@@ -13,6 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javalin.version>7.2.0</javalin.version>
         <junit.version>5.12.2</junit.version>
+        <jbcrypt.version>0.4</jbcrypt.version>
+        <postgresql.version>42.7.8</postgresql.version>
     </properties>
 
     <dependencies>
@@ -20,6 +22,18 @@
             <groupId>io.javalin</groupId>
             <artifactId>javalin-bundle</artifactId>
             <version>${javalin.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>${jbcrypt.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
         </dependency>
 
         <dependency>
