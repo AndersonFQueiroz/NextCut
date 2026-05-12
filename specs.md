@@ -51,12 +51,13 @@ Cliente → HTTP/WebSocket → Javalin → Service → DAO → Supabase (Postgre
 ## 4. Estrutura de Pacotes
 
 com.nextcut
+- app
+- config
 - controller
 - service
 - model
 - dao
 - websocket
-- app
 
 ---
 

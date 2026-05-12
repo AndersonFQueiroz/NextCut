@@ -275,7 +275,7 @@ Pré-requisitos:
 ```bash
 cd backend
 mvn test
-mvn exec:java -Dexec.mainClass="com.nextcut.app.Main"
+mvn exec:java -Dexec.mainClass="com.nextcut.app.App"
 ```
 
 Por padrão, a API sobe em:
@@ -300,6 +300,8 @@ http://localhost:8080
 ---
 
 # 🧪 Testes
+
+> **Issue #9:** o frontend usa **Vitest** + Testing Library (padrão recomendado com Vite); o comando continua sendo `npm test`, como nos critérios de aceite.
 
 ## Backend
 
