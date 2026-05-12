@@ -13,7 +13,7 @@ Exemplo:
 ```bash
 git checkout develop
 git pull origin develop
-git checkout -b feature/anderson-backend-setup
+git checkout -b feature/nome-backend-setup
 ```
 
 ## Commits
