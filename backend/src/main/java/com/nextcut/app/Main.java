@@ -1,10 +1,13 @@
 package com.nextcut.app;
 
-import com.nextcut.config.AppProperties;
+/**
+ * Mantido para compatibilidade com comandos antigos; delega para {@link App}.
+ */
+public final class Main {
+    private Main() {
+    }
 
-public class Main {
     public static void main(String[] args) {
-        var properties = AppProperties.fromEnvironment();
-        AppFactory.create().start(properties.port());
+        App.main(args);
     }
 }
