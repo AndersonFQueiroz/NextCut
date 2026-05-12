@@ -1,95 +1,10 @@
-# ✂️ NextCut — Fila Virtual para Barbearia
+# NextCut
 
-<div align="center">
+[![CI Tests](https://github.com/AndersonFQueiroz/NextCut/actions/workflows/tests.yml/badge.svg)](https://github.com/AndersonFQueiroz/NextCut/actions/workflows/tests.yml)
 
-## 🚀 Modernizando o atendimento da barbearia com tecnologia em tempo real
+Base do frontend (**React + Vite + TailwindCSS**), componentes **Button / Input / Card**, testes (**Vitest** no frontend, **JUnit 5 + Mockito** no backend mínimo) e **GitHub Actions**.
 
-### Transforme o antigo caderno físico em uma experiência digital inteligente, rápida e profissional.
-
-![React](https://img.shields.io/badge/Frontend-React_JS-61DAFB?style=for-the-badge&logo=react)
-![Java](https://img.shields.io/badge/Backend-Java_17+-ED8B00?style=for-the-badge&logo=openjdk)
-![Javalin](https://img.shields.io/badge/API-Javalin-000000?style=for-the-badge)
-![Supabase](https://img.shields.io/badge/Database-Supabase-3ECF8E?style=for-the-badge&logo=supabase)
-![PostgreSQL](https://img.shields.io/badge/DB-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)
-![WebSocket](https://img.shields.io/badge/Realtime-WebSocket-010101?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-JUnit_+_Mockito-success?style=for-the-badge)
-
-</div>
-
----
-
-# 📌 Sobre o Projeto
-
-**NextCut** é uma plataforma web de fila virtual em **fase de planejamento e design** para barbearias que desejam abandonar métodos manuais e oferecer uma experiência moderna aos clientes.
-
-> 🎯 **Estado Atual**: Documento de especificação e arquitetura. Implementação em breve.
-
-## 🎯 Problema Resolvido
-### Antes:
-- Caderno físico
-- Confusão na ordem
-- Cliente preso no local
-- Falta de previsibilidade
-- Gestão manual
-
-### Depois:
-- Entrada via link
-- Fila em tempo real
-- Senha automática
-- Acompanhamento remoto
-- Painel administrativo
-
----
-
-# 🌟 Principais Funcionalidades
-
-## 👤 Cliente
-- Entrar na fila com nome + telefone
-- Receber senha sequencial automática
-- Acompanhar posição em tempo real
-- Ver estimativa de espera
-- Sair da fila
-
-## 💈 Barbeiro (Admin)
-- Login seguro
-- Visualizar fila completa
-- Chamar próximo cliente
-- Remover clientes
-- Abrir/Fechar atendimento
-- Ajustar tempo médio de serviço
-
----
-
-# 🧠 Arquitetura do Sistema
-
-```mermaid
-flowchart LR
-    A[Cliente / Barbeiro Frontend React] --> B[HTTP REST API]
-    A --> C[WebSocket Tempo Real]
-    B --> D[Javalin Controllers]
-    C --> E[WebSocket Manager]
-    D --> F[Service Layer]
-    E --> F
-    F --> G[DAO Layer]
-    G --> H[(Supabase PostgreSQL)]
-````
-
----
-
-# 🏗️ Clean Architecture
-
-```mermaid
-flowchart TD
-    UI[Frontend React] --> Controller
-    Controller --> Service
-    Service --> DAO
-    DAO --> Database[(Supabase)]
-    Service --> QueueMemory[(ArrayDeque FIFO)]
-```
-
----
-
-# 📂 Estrutura de Pastas
+## Rodar o frontend
 
 ```bash
 nextcut/
@@ -226,21 +141,20 @@ GET /
 POST /queue/join
 GET /queue/status/{phone}
 POST /queue/leave/{phone}
+cd frontend
+npm install
+npm run dev
 ```
 
-## Admin
+## Testes
 
-```http
-POST /login
-POST /admin/next
-POST /admin/remove/{id}
-POST /admin/toggle
+```bash
+cd frontend && npm test
+cd backend && mvn test
 ```
 
-## WebSocket
+## Estrutura
 
-```http
-/ws/queue
 ```
 
 ## Rodar o backend localmente
@@ -392,3 +306,7 @@ Este projeto pode ser adaptado para fins acadêmicos, comerciais ou evolutivos c
 ## “Sua barbearia merece mais que papel.”
 
 </div>
+├── frontend/     # Vite + React + Tailwind
+├── backend/      # Maven — apenas dependências de teste (issue #9)
+└── .github/workflows/tests.yml
+```
