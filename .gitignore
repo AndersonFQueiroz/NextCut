@@ -4,6 +4,11 @@ target/
 .m2/
 dependency-reduced-pom.xml
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/*.log
+
 # Environment
 .env
 .env.*
