@@ -1,19 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  font-family: Inter, system-ui, sans-serif;
+  --font-display: 'Cinzel', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --background: oklch(0.13 0.01 20);
+  --foreground: oklch(0.97 0.005 30);
+  --wine: oklch(0.42 0.14 17);
+  --wine-glow: oklch(0.55 0.18 18);
+  --gradient-wine: linear-gradient(135deg, oklch(0.42 0.14 17), oklch(0.32 0.12 18));
+  --gradient-dark: radial-gradient(ellipse at top, oklch(0.18 0.02 20), oklch(0.08 0.005 20));
+  --shadow-wine: 0 10px 40px -10px oklch(0.42 0.14 17 / 0.5);
+  color-scheme: dark;
+  font-family: var(--font-sans);
 }
 
 body {
   min-height: 100vh;
-  background: #f8fafc;
+  background: var(--background);
 }
 
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid #f59e0b;
+  outline: 2px solid var(--wine-glow);
   outline-offset: 2px;
 }
