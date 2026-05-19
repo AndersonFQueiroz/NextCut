@@ -34,12 +34,13 @@ public final class AppFactory {
             queueController.register(config.routes);
             authController.register(config.routes);
             queueWebSocket.register(config.routes, queueService);
-        })
-        .exception(HttpResponseException.class, (e, ctx) -> {
-            ctx.status(e.getStatus()).json(ApiErrorResponse.of(e.getMessage()));
-        })
-        .exception(Exception.class, (e, ctx) -> {
-            ctx.status(500).json(ApiErrorResponse.of("Erro interno do servidor"));
+
+            config.router.exception(HttpResponseException.class, (e, ctx) -> {
+                ctx.status(e.getStatus()).json(ApiErrorResponse.of(e.getMessage()));
+            });
+            config.router.exception(Exception.class, (e, ctx) -> {
+                ctx.status(500).json(ApiErrorResponse.of("Erro interno do servidor"));
+            });
         });
     }
 
