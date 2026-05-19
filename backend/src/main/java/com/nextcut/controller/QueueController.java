@@ -14,21 +14,21 @@ public class QueueController {
     public void register(RoutesConfig routes) {
         routes.post("/queue/join", ctx -> {
             var request = ctx.bodyAsClass(QueueJoinRequest.class);
-            ctx.status(201).json(queueService.join(request));
+            ctx.status(201).json(ApiResponse.ok(queueService.join(request)));
         });
 
-        routes.get("/queue", ctx -> ctx.json(queueService.snapshot()));
+        routes.get("/queue", ctx -> ctx.json(ApiResponse.ok(queueService.snapshot())));
 
         routes.get("/queue/status/{phone}", ctx -> {
             var phone = ctx.pathParam("phone");
-            ctx.json(queueService.statusByPhone(phone));
+            ctx.json(ApiResponse.ok(queueService.statusByPhone(phone)));
         });
 
         routes.post("/queue/leave/{phone}", ctx -> {
             var phone = ctx.pathParam("phone");
-            ctx.json(queueService.leave(phone));
+            ctx.json(ApiResponse.ok(queueService.leave(phone)));
         });
 
-        routes.post("/admin/next", ctx -> ctx.json(queueService.callNext()));
+        routes.post("/admin/next", ctx -> ctx.json(ApiResponse.ok(queueService.callNext())));
     }
 }
