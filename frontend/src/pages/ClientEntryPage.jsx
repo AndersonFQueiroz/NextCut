@@ -19,14 +19,12 @@ function maskPhone(value) {
 }
 
 function getErrorMessage(error) {
-  if (typeof error.response?.data === 'string') {
-    return error.response.data
+  if (error.response?.status === 409) {
+    return 'Telefone já cadastrado na fila'
   }
 
   return (
     error.userMessage ||
-    error.response?.data?.message ||
-    error.response?.data?.title ||
     'Nao foi possivel entrar na fila. Verifique os dados e tente novamente.'
   )
 }
