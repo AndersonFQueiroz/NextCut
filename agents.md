@@ -509,6 +509,7 @@ Esta seção documenta erros comuns que agentes de IA cometem neste projeto. Sã
 ## Git:
 - ❌ Commitar `.env` ou arquivos com credenciais reais
 - ❌ Commitar `node_modules`, `target/`, `build/`, `.class`
+- ❌ Commitar prints de tela, screenshots de erros ou arquivos de feedback externo (ex: notas de professores)
 - ❌ Mensagens de commit genéricas ("update", "fix", "wip")
 - ❌ Adicionar co-autoria de IA no commit
 
