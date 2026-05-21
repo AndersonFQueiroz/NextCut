@@ -6,7 +6,7 @@
 
     <groupId>com.nextcut</groupId>
     <artifactId>nextcut-backend</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>NextCut Backend</name>
 
@@ -16,7 +16,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javalin.version>7.2.0</javalin.version>
-        <junit.version>5.12.2</junit.version>
+        <junit.version>5.10.2</junit.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <postgresql.version>42.7.8</postgresql.version>
         <mockito.version>5.11.0</mockito.version>
@@ -24,21 +24,28 @@
     </properties>
 
     <dependencies>
+        <!-- Web Framework -->
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
             <version>${javalin.version}</version>
         </dependency>
+        
+        <!-- Security -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
             <version>${jbcrypt.version}</version>
         </dependency>
+        
+        <!-- Database -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
         </dependency>
+        
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -49,6 +56,8 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
+
+        <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
