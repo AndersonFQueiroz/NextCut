@@ -6,7 +6,16 @@ import useQueueSocket from '../hooks/useQueueSocket'
 import api from '../services/api'
 
 function getErrorMessage(error) {
-  return error.userMessage || 'Nao foi possivel concluir a acao. Tente novamente em instantes.'
+  if (typeof error.response?.data === 'string') {
+    return error.response.data
+  }
+
+  return (
+    error.userMessage ||
+    error.response?.data?.message ||
+    error.response?.data?.title ||
+    'Nao foi possivel concluir a acao. Tente novamente em instantes.'
+  )
 }
 
 function MetricCard({ icon: Icon, label, value }) {

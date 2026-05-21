@@ -23,8 +23,14 @@ function getErrorMessage(error) {
     return 'Telefone já cadastrado na fila'
   }
 
+  if (typeof error.response?.data === 'string') {
+    return error.response.data
+  }
+
   return (
     error.userMessage ||
+    error.response?.data?.message ||
+    error.response?.data?.title ||
     'Nao foi possivel entrar na fila. Verifique os dados e tente novamente.'
   )
 }
