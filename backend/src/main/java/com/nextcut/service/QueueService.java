@@ -72,11 +72,16 @@ public class QueueService {
 
     /**
      * Busca o status de um cliente específico pelo telefone.
+     * Inclui a estimativa de tempo baseada na posição.
      */
-    public synchronized QueueEntry statusByPhone(String phone) {
+    public synchronized QueueStatusResponse statusByPhone(String phone) {
         var normalizedPhone = PhoneNormalizer.normalize(phone);
-        return queueEntryDao.findWaitingByPhone(normalizedPhone)
+        var entry = queueEntryDao.findWaitingByPhone(normalizedPhone)
             .orElseThrow(() -> new NotFoundResponse("Nenhum atendimento ativo encontrado para este número."));
+        
+        // Atualmente usamos 15 minutos como padrão (Semana 2)
+        // Na Semana 3, isso virá dinamicamente do barbeiro
+        return QueueStatusResponse.from(entry, 15);
     }
 
     /**
