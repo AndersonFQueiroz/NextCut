@@ -22,7 +22,7 @@ public class QueueController {
     public void register(RoutesConfig routes) {
         routes.post("/queue/join", ctx -> {
             var request = ctx.bodyAsClass(QueueJoinRequest.class);
-            ctx.status(201).json(ApiResponse.ok(queueService.join(request)));
+            ctx.status(200).json(ApiResponse.ok(queueService.join(request)));
         });
 
         routes.get("/queue", ctx -> ctx.json(ApiResponse.ok(queueService.snapshot())));
