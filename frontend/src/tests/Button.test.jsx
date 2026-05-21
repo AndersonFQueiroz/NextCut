@@ -47,9 +47,9 @@ describe('Button', () => {
     render(<Button variant="secondary">Secundário</Button>)
     const button = screen.getByRole('button')
 
-    // Variante secondary tem bg-transparent + borda escura do painel admin
+    // Variante secondary tem bg-transparent + borda âmbar
     expect(button.className).toContain('bg-transparent')
-    expect(button.className).toContain('border-[#333]')
+    expect(button.className).toContain('border-amber-400')
   })
 
   // ─── Estado disabled ───────────────────────────────────────────────────────

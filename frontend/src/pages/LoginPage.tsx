@@ -1,8 +1,5 @@
 import { CalendarCheck, Lock, Mail, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import Button from '../components/Button'
-import Card from '../components/Card'
-import Input from '../components/Input'
 import nextCutLogo from '../../novo logo.png'
 
 export function LoginPage() {
@@ -23,7 +20,7 @@ export function LoginPage() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-red-600">Painel do barbeiro</p>
         </header>
 
-        <Card className="bg-[#111111] border border-[#8f1728] rounded-xl shadow-[0_0_22px_rgba(143,23,40,0.42),0_0_72px_rgba(120,18,34,0.38)]">
+        <section className="rounded-xl border border-[#8f1728] bg-[#111111] p-6 shadow-[0_0_22px_rgba(143,23,40,0.42),0_0_72px_rgba(120,18,34,0.38)]">
           <div className="flex flex-col items-center gap-3 text-center">
             <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#7a1520]">
               <CalendarCheck className="h-5 w-5 text-stone-100" />
@@ -37,21 +34,33 @@ export function LoginPage() {
           </div>
 
           <div className="mt-8 space-y-5">
-            <Input
-              admin
-              label="Usuario"
-              name="username"
-              placeholder="seu.usuario"
-              icon={<User className="h-4 w-4" />}
-            />
-            <Input
-              admin
-              label="Senha"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              icon={<Lock className="h-4 w-4" />}
-            />
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#aaa]">Usuario</span>
+              <span className="relative block">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-red-600">
+                  <User className="h-4 w-4" />
+                </span>
+                <input
+                  name="username"
+                  placeholder="seu.usuario"
+                  className="mt-2 h-12 w-full rounded-lg border border-[#333] bg-[#1e1e1e] px-4 py-3 pl-10 text-sm text-white placeholder:text-[#555] transition focus:border-[#8b1a1a] focus:outline-none"
+                />
+              </span>
+            </label>
+            <label className="block">
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#aaa]">Senha</span>
+              <span className="relative block">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-red-600">
+                  <Lock className="h-4 w-4" />
+                </span>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  className="mt-2 h-12 w-full rounded-lg border border-[#333] bg-[#1e1e1e] px-4 py-3 pl-10 text-sm text-white placeholder:text-[#555] transition focus:border-[#8b1a1a] focus:outline-none"
+                />
+              </span>
+            </label>
           </div>
 
           <div className="mt-5 flex items-center justify-between gap-4 text-sm text-stone-400">
@@ -64,9 +73,13 @@ export function LoginPage() {
             </a>
           </div>
 
-          <Button variant="danger" fullWidth className="mt-6 h-12" onClick={() => navigate('/admin')}>
+          <button
+            type="button"
+            className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-full bg-[#9f1d35] px-5 py-3 text-sm font-semibold uppercase tracking-widest text-stone-100 transition hover:bg-[#b42640]"
+            onClick={() => navigate('/admin')}
+          >
             Entrar no painel
-          </Button>
+          </button>
 
           <div className="my-7 flex items-center gap-3">
             <span className="h-px flex-1 bg-[#242424]" />
@@ -74,15 +87,18 @@ export function LoginPage() {
             <span className="h-px flex-1 bg-[#242424]" />
           </div>
 
-          <Button variant="secondary" fullWidth className="h-12 gap-3">
+          <button
+            type="button"
+            className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[#333] bg-transparent px-5 py-3 text-sm font-semibold uppercase tracking-widest text-stone-100 transition hover:border-[#8b1a1a] hover:bg-[#1e1e1e]"
+          >
             <Mail className="h-4 w-4 text-red-600" />
             Entrar com Google
-          </Button>
+          </button>
 
           <p className="mt-6 text-center text-sm text-stone-400">
             Acesso exclusivo para profissionais. Solicite credenciais ao gerente.
           </p>
-        </Card>
+        </section>
 
         <footer className="mt-7 text-center text-xs text-stone-600">© 2026 NextCut · Painel interno</footer>
       </div>
