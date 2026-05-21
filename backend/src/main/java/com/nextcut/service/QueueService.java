@@ -5,6 +5,7 @@ import com.nextcut.model.QueueEntry;
 import com.nextcut.model.QueueJoinRequest;
 import com.nextcut.model.QueueSnapshot;
 import com.nextcut.model.QueueStatus;
+import com.nextcut.model.QueueStatusResponse;
 import com.nextcut.util.PhoneNormalizer;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ConflictResponse;
