@@ -10,9 +10,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Implementação JDBC para persistência de entradas na fila.
+ * Utiliza SQL nativo com PreparedStatements para garantir segurança e performance.
+ */
 public class JdbcQueueEntryDao implements QueueEntryDao {
 
-    // ── INSERT ────────────────────────────────────────────────
+    /**
+     * Salva uma nova entrada de cliente no banco de dados.
+     * @param entry Objeto contendo os dados do cliente e sua posição.
+     * @return A própria entrada salva para encadeamento.
+     */
     @Override
     public QueueEntry save(QueueEntry entry) {
         var sql = """
@@ -39,7 +47,11 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
         }
     }
 
-    // ── SELECT por telefone ───────────────────────────────────
+    /**
+     * Busca uma entrada ativa (WAITING) vinculada a um número de telefone no dia atual.
+     * @param phone Telefone do cliente.
+     * @return Optional contendo a entrada se encontrada.
+     */
     @Override
     public Optional<QueueEntry> findWaitingByPhone(String phone) {
         var sql = """
@@ -66,7 +78,10 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
         }
     }
 
-    // ── SELECT fila completa ordenada por posição ─────────────
+    /**
+     * Retorna todos os clientes que estão aguardando atendimento hoje, ordenados por posição.
+     * @return Lista de entradas com status WAITING.
+     */
     @Override
     public List<QueueEntry> findWaitingEntries() {
         var sql = """
@@ -90,7 +105,10 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
         }
     }
 
-    // ── UPDATE genérico (status + position + calledAt) ────────
+    /**
+     * Atualiza os dados de uma entrada existente (status, posição e data de chamada).
+     * @param entry Objeto QueueEntry com os dados atualizados.
+     */
     @Override
     public void update(QueueEntry entry) {
         var sql = """
@@ -115,7 +133,13 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
         }
     }
 
-    // ── UPDATE só o status (chamado pelo barbeiro) ────────────
+    /**
+     * Atualiza apenas o status de uma entrada. Se o novo status for IN_SERVICE,
+     * registra automaticamente o momento da chamada (called_at).
+     * @param id UUID da entrada.
+     * @param status Novo status (ex: IN_SERVICE, COMPLETED, CANCELLED).
+     */
+    @Override
     public void updateStatus(UUID id, QueueStatus status) {
         var sql = """
                 UPDATE queue_entries
@@ -140,7 +164,11 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
         }
     }
 
-    // ── UPDATE recalcula posições após remoção ────────────────
+    /**
+     * Recalcula sequencialmente a posição de todos os clientes em espera hoje.
+     * Útil após remoções ou cancelamentos para manter a fila íntegra.
+     */
+    @Override
     public void updatePositions() {
         var sql = """
                 UPDATE queue_entries

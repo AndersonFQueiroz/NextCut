@@ -4,6 +4,10 @@ import com.nextcut.model.QueueJoinRequest;
 import com.nextcut.service.QueueService;
 import io.javalin.config.RoutesConfig;
 
+/**
+ * Controlador responsável por expor os endpoints REST da fila de atendimento.
+ * Gerencia as operações de entrada, saída e consulta de status para clientes e barbeiros.
+ */
 public class QueueController {
     private final QueueService queueService;
 
@@ -11,6 +15,10 @@ public class QueueController {
         this.queueService = queueService;
     }
 
+    /**
+     * Registra as rotas da fila na configuração do Javalin.
+     * @param routes Objeto de configuração de rotas.
+     */
     public void register(RoutesConfig routes) {
         routes.post("/queue/join", ctx -> {
             var request = ctx.bodyAsClass(QueueJoinRequest.class);
