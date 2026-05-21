@@ -1,20 +1,12 @@
-import { ArrowLeft, Clock, Loader2, LogOut, Phone, Ticket } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { AlertTriangle, ArrowLeft, Clock, Loader2, LogOut, Phone, Ticket } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import nextCutLogo from '../assets/nextcut-logo.png'
+import useQueueSocket from '../hooks/useQueueSocket'
 import api from '../services/api'
 
 function getErrorMessage(error) {
-  if (typeof error.response?.data === 'string') {
-    return error.response.data
-  }
-
-  return (
-    error.userMessage ||
-    error.response?.data?.message ||
-    error.response?.data?.title ||
-    'Nao foi possivel carregar sua posicao na fila.'
-  )
+  return error.userMessage || 'Nao foi possivel concluir a acao. Tente novamente em instantes.'
 }
 
 function MetricCard({ icon: Icon, label, value }) {
@@ -35,6 +27,26 @@ function MetricCard({ icon: Icon, label, value }) {
   )
 }
 
+function QueueStatusSkeleton() {
+  return (
+    <div className="mt-8 grid gap-4 sm:grid-cols-3" aria-label="Carregando status da fila">
+      {[0, 1, 2].map((item) => (
+        <div
+          key={item}
+          className="rounded-xl border p-4"
+          style={{
+            background: 'oklch(0.18 0.01 20 / 0.55)',
+            borderColor: 'oklch(0.42 0.14 17 / 0.28)',
+          }}
+        >
+          <div className="h-4 w-24 animate-pulse rounded-full" style={{ background: 'oklch(0.42 0.14 17 / 0.35)' }} />
+          <div className="mt-4 h-8 w-16 animate-pulse rounded-lg" style={{ background: 'oklch(0.32 0.03 20 / 0.7)' }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function QueueStatusPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -43,48 +55,12 @@ export default function QueueStatusPage() {
     () => location.state?.phone || searchParams.get('phone') || sessionStorage.getItem('nextcut.clientPhone') || '',
     [location.state?.phone, searchParams],
   )
-  const [queueEntry, setQueueEntry] = useState(null)
-  const [isLoading, setIsLoading] = useState(Boolean(phone))
   const [isLeaving, setIsLeaving] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (!phone) {
-      setError('Informe seu telefone para acompanhar a fila.')
-      setIsLoading(false)
-      return
-    }
-
-    let isActive = true
-
-    async function loadStatus() {
-      setIsLoading(true)
-      setError('')
-
-      try {
-        const response = await api.get(`/queue/status/${encodeURIComponent(phone)}`)
-
-        if (isActive) {
-          setQueueEntry(response.data)
-        }
-      } catch (requestError) {
-        if (isActive) {
-          setError(getErrorMessage(requestError))
-        }
-      } finally {
-        if (isActive) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    loadStatus()
-
-    return () => {
-      isActive = false
-    }
-  }, [phone])
+  const { queueEntry, hasSnapshot, isReconnecting } = useQueueSocket(phone)
+  const isLoading = Boolean(phone) && !hasSnapshot
+  const pageError = !phone ? 'Informe seu telefone para acompanhar a fila.' : error
 
   const handleLeaveQueue = async () => {
     if (!phone) {
@@ -99,7 +75,6 @@ export default function QueueStatusPage() {
     try {
       await api.post(`/queue/leave/${encodeURIComponent(phone)}`)
       sessionStorage.removeItem('nextcut.clientPhone')
-      setQueueEntry(null)
       setMessage('Voce saiu da fila.')
     } catch (requestError) {
       setError(getErrorMessage(requestError))
@@ -159,11 +134,22 @@ export default function QueueStatusPage() {
             </button>
           </div>
 
-          {isLoading ? (
-            <div className="mt-10 flex items-center justify-center gap-3 py-10 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
-              <Loader2 className="h-5 w-5 animate-spin text-[var(--wine-glow)]" />
-              Carregando sua posicao...
+          {isReconnecting ? (
+            <div
+              className="mt-6 flex items-center gap-3 rounded-lg border px-4 py-3 text-sm"
+              style={{
+                background: 'oklch(0.24 0.08 70 / 0.35)',
+                borderColor: 'oklch(0.67 0.16 70 / 0.45)',
+                color: 'oklch(0.9 0.1 80)',
+              }}
+            >
+              <AlertTriangle className="h-4 w-4 flex-none" />
+              <span>Conexão perdida, reconectando...</span>
             </div>
+          ) : null}
+
+          {isLoading ? (
+            <QueueStatusSkeleton />
           ) : (
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <MetricCard icon={Ticket} label="Senha" value={queueEntry?.ticketNumber ?? '--'} />
@@ -172,7 +158,7 @@ export default function QueueStatusPage() {
             </div>
           )}
 
-          {error ? (
+          {pageError ? (
             <div
               className="mt-6 rounded-lg border px-4 py-3 text-sm"
               style={{
@@ -181,7 +167,7 @@ export default function QueueStatusPage() {
                 color: 'oklch(0.86 0.08 25)',
               }}
             >
-              {error}
+              {pageError}
             </div>
           ) : null}
 
