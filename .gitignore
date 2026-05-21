@@ -18,6 +18,11 @@ frontend/*.log
 .idea/
 .vscode/
 .agents/
+.cursor/
+
+# Planejamento e Notas (Privado)
+planejamento*.png
+nota_professor*.*
 
 # OS
 .DS_Store
