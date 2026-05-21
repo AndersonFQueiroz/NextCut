@@ -8,4 +8,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   // plugins: lista de extensões do Vite; sem @vitejs/plugin-react o projeto não entenderia JSX em .tsx.
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/tests/setup.js',
+    globals: true,
+  },
 })

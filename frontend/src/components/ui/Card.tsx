@@ -8,14 +8,19 @@ interface CardProps extends HTMLAttributes<HTMLElement> {
 }
 
 /**
- * Card — “caixa” visual (borda + fundo + sombra definidos na classe .login-card no CSS).
+ * Card — caixa visual com fundo, borda e sombra do painel.
  * Usamos <section> por ser um agrupador semântico de um bloco da página.
  * className extra (ex.: admin-shell) soma estilos sem remover o visual base do cartão.
  */
 export function Card({ children, className = '', ...rest }: CardProps) {
   // Array com a classe base do cartão e a className opcional; filter(Boolean) remove string vazia.
   // join(' ') vira uma única string de classes separadas por espaço.
-  const classes = ['login-card', className].filter(Boolean).join(' ').trim()
+  const classes = [
+    'rounded-xl border border-[#242424] bg-[#111111] p-6 shadow-2xl shadow-black/70',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   // ...rest leva aria-labelledby, role, data-* etc. se você passar do componente pai.
   return (

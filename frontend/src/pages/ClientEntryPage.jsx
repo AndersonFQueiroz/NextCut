@@ -1,6 +1,9 @@
 import { Loader2, Phone, Scissors, User } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/Button'
+import Card from '../components/Card'
+import Input from '../components/Input'
 import nextCutLogo from '../assets/nextcut-logo.png'
 import api from '../services/api'
 
@@ -80,115 +83,66 @@ export default function ClientEntryPage() {
   }
 
   return (
-    <main
-      className="relative min-h-screen overflow-hidden px-4 py-8 text-[var(--foreground)]"
-      style={{ background: 'var(--gradient-dark)' }}
-    >
-      <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
-      <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#080808] px-4 py-10 text-stone-100">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(120,18,34,0.22),transparent_45%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.1),rgba(0,0,0,0.6))]" />
 
-      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
-        <header className="mb-7 flex flex-col items-center gap-3 text-center">
-          <img
-            src={nextCutLogo}
-            alt="Logo NextCut"
-            className="h-40 w-40 object-contain sm:h-48 sm:w-48"
-            style={{ filter: 'drop-shadow(var(--shadow-wine))' }}
-          />
-          <p className="font-sans text-xs uppercase tracking-[0.35em] text-[var(--wine-glow)]">Fila digital</p>
+      <div className="relative z-10 w-full max-w-[460px]">
+        <header className="mb-8 flex flex-col items-center text-center">
+          <img src={nextCutLogo} alt="Logo NextCut" className="h-40 w-40 object-contain" />
+          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-red-600">Fila digital</p>
         </header>
 
-        <section
-          className="w-full rounded-2xl border p-6 shadow-2xl backdrop-blur-sm sm:p-8"
-          style={{
-            background: 'oklch(0.16 0.01 20 / 0.7)',
-            borderColor: 'oklch(0.42 0.14 17 / 0.3)',
-            boxShadow: 'var(--shadow-wine)',
-          }}
-        >
+        <Card className="bg-[#111111] border border-[#242424] rounded-xl shadow-2xl shadow-black/70">
           <div className="flex items-start gap-3">
-            <span
-              className="flex h-10 w-10 flex-none items-center justify-center rounded-lg"
-              style={{ background: 'oklch(0.42 0.14 17 / 0.18)' }}
-            >
-              <Scissors className="h-5 w-5 text-[var(--wine-glow)]" />
+            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#7a1520]">
+              <Scissors className="h-5 w-5 text-stone-100" />
             </span>
             <div>
-              <h1 className="text-xl font-medium text-[var(--foreground)]" style={{ fontFamily: 'var(--font-display)' }}>
-                Entrar na fila
-              </h1>
-              <p className="mt-1 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
-                Informe seus dados para acompanhar sua vez.
-              </p>
+              <h1 className="font-serif text-3xl font-bold uppercase tracking-[0.25em] text-stone-50">Entrar na fila</h1>
+              <p className="mt-2 text-sm text-stone-400">Informe seus dados para acompanhar sua vez.</p>
             </div>
           </div>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
-            <label className="block space-y-2">
-              <span className="block text-xs uppercase tracking-widest" style={{ color: 'oklch(0.65 0.01 20)' }}>
-                Nome
-              </span>
-              <span className="relative block">
-                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--wine-glow)]" />
-                <input
-                  type="text"
-                  name="clientName"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Seu nome"
-                  className="h-12 w-full rounded-lg border bg-transparent pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-slate-500 transition-colors focus:border-[oklch(0.55_0.18_18)]"
-                  style={{ borderColor: errors.name ? 'oklch(0.58 0.2 25)' : 'oklch(0.3 0.02 20)' }}
-                  aria-invalid={Boolean(errors.name)}
-                />
-              </span>
-              {errors.name ? <span className="block text-xs text-red-300">{errors.name}</span> : null}
-            </label>
+            <Input
+              admin
+              label="Nome"
+              name="clientName"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Seu nome"
+              error={errors.name}
+              icon={<User className="h-4 w-4" />}
+              aria-invalid={Boolean(errors.name)}
+            />
 
-            <label className="block space-y-2">
-              <span className="block text-xs uppercase tracking-widest" style={{ color: 'oklch(0.65 0.01 20)' }}>
-                Telefone
-              </span>
-              <span className="relative block">
-                <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--wine-glow)]" />
-                <input
-                  type="tel"
-                  name="clientPhone"
-                  value={phone}
-                  onChange={(event) => setPhone(maskPhone(event.target.value))}
-                  placeholder="(00) 00000-0000"
-                  className="h-12 w-full rounded-lg border bg-transparent pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-slate-500 transition-colors focus:border-[oklch(0.55_0.18_18)]"
-                  style={{ borderColor: errors.phone ? 'oklch(0.58 0.2 25)' : 'oklch(0.3 0.02 20)' }}
-                  aria-invalid={Boolean(errors.phone)}
-                />
-              </span>
-              {errors.phone ? <span className="block text-xs text-red-300">{errors.phone}</span> : null}
-            </label>
+            <Input
+              admin
+              label="Telefone"
+              name="clientPhone"
+              type="tel"
+              value={phone}
+              onChange={(event) => setPhone(maskPhone(event.target.value))}
+              placeholder="(00) 00000-0000"
+              error={errors.phone}
+              icon={<Phone className="h-4 w-4" />}
+              aria-invalid={Boolean(errors.phone)}
+            />
 
             {apiError ? (
-              <div
-                className="rounded-lg border px-4 py-3 text-sm"
-                style={{
-                  background: 'oklch(0.2 0.06 25 / 0.45)',
-                  borderColor: 'oklch(0.58 0.2 25 / 0.45)',
-                  color: 'oklch(0.86 0.08 25)',
-                }}
-              >
+              <div className="rounded-lg border border-[#8b1a1a] bg-[#1e1e1e] px-4 py-3 text-sm text-stone-100">
                 {apiError}
               </div>
             ) : null}
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-lg font-semibold uppercase tracking-widest text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
-              style={{ background: 'var(--gradient-wine)', boxShadow: 'var(--shadow-wine)' }}
-            >
+            <Button variant="danger" type="submit" fullWidth disabled={isSubmitting} className="h-12 gap-2">
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {isSubmitting ? 'Entrando...' : 'Entrar na fila'}
-            </button>
+            </Button>
           </form>
-        </section>
-      </section>
+        </Card>
+      </div>
     </main>
   )
 }
