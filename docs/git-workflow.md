@@ -73,7 +73,7 @@ git commit -m "docs: adicionar fluxo de pull requests"
 - O PR deve explicar o que foi feito e qual issue/tarefa atende.
 - O PR não deve misturar frontend, backend e documentação sem necessidade.
 - Código Java deve compilar e testes devem passar com `mvn test` dentro de `backend/`.
-- Mudanças em banco de dados devem incluir script SQL em `backend/src/main/resources/db/migration` ou pasta equivalente definida pela equipe.
+- Mudanças em banco de dados devem incluir script SQL em `docs/sql/` ou pasta equivalente definida pela equipe.
 - Não commitar credenciais, tokens, URLs privadas de banco ou arquivos `.env`.
 
 ## Checklist de PR

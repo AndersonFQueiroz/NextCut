@@ -18,6 +18,18 @@ frontend/*.log
 .idea/
 .vscode/
 .agents/
+.cursor/
+
+# Planejamento e Notas (Privado - NUNCA COMMITAR)
+planejamento*.*
+nota_professor*.*
+criterio*.*
+issuemuginski*.*
+erro*.*
+*.png
+*.jpg
+*.jpeg
+*.gif
 
 # OS
 .DS_Store
