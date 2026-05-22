@@ -188,8 +188,10 @@ nextcut/
 ## 🗄️ Banco de Dados
 
 * Supabase PostgreSQL
-* Supabase Auth
-* Supabase Realtime
+* JDBC
+* Scripts SQL em `docs/sql/`
+* Autenticação própria com BCrypt
+* Atualização em tempo real via WebSocket Javalin
 
 ---
 

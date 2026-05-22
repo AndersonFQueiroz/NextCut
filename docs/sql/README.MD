@@ -8,7 +8,7 @@ Documentação do banco de dados PostgreSQL via Supabase utilizado no sistema de
 
 - **Supabase** (PostgreSQL gerenciado)
 - **JDBC** para conexão com o backend Java
-- **Supabase Realtime** para atualizações em tempo real
+- **WebSocket Javalin** para atualizações em tempo real na aplicação
 - **Row Level Security (RLS)** para segurança por linha
 
 ---
@@ -115,10 +115,9 @@ SELECT * FROM vw_active_queue;
 
 ---
 
-## 📡 Realtime
+## 📡 Tempo real
 
-As tabelas `queue_entries` e `barber` estão com Realtime habilitado no Supabase.
-O frontend React recebe atualizações automáticas via WebSocket sempre que a fila mudar.
+O script prepara a publicação `supabase_realtime`, mas o backend atual envia atualizações para o frontend por WebSocket Javalin no endpoint `/ws/queue`.
 
 ---
 
