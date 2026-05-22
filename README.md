@@ -22,11 +22,32 @@
 
 # 🛠️ Início rápido (desenvolvimento)
 
+Pré-requisitos:
+
+* Node.js 20+
+* Java 17+
+* Maven 3.9+
+
+**Backend** (Javalin + Maven):
+
+```bash
+cd backend
+mvn test
+mvn exec:java -Dexec.mainClass="com.nextcut.app.App"
+```
+
+Por padrão, a API sobe em:
+
+```http
+http://localhost:8080
+```
+
 **Frontend** (Vite + React + Tailwind; testes com Vitest em ambiente `jsdom`):
 
 ```bash
 cd frontend
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -41,9 +62,9 @@ cd backend && mvn test
 
 # 📌 Sobre o Projeto
 
-**NextCut** é uma plataforma web de fila virtual em **fase de planejamento e design** para barbearias que desejam abandonar métodos manuais e oferecer uma experiência moderna aos clientes.
+**NextCut** é uma plataforma web de fila virtual para barbearias que desejam abandonar métodos manuais e oferecer uma experiência moderna aos clientes.
 
-> 🎯 **Estado Atual**: documentação e arquitetura definidas; **frontend base** (componentes e Vitest) e **backend** com Javalin e fila em memória em evolução. Próximos passos: Supabase/JDBC e fluxo completo na UI.
+> 🎯 **Estado atual**: frontend React com telas de cliente, acompanhamento da fila, login e painel administrativo; backend Java com Javalin, JDBC/PostgreSQL, autenticação BCrypt, fila FIFO e WebSocket para atualização em tempo real. Algumas ações administrativas exibidas na UI ainda dependem de endpoints backend futuros, conforme planejamento do projeto.
 
 ## 🎯 Problema Resolvido
 ### Antes:
@@ -75,9 +96,9 @@ cd backend && mvn test
 - Login seguro
 - Visualizar fila completa
 - Chamar próximo cliente
-- Remover clientes
-- Abrir/Fechar atendimento
-- Ajustar tempo médio de serviço
+- Remover clientes (previsto no planejamento)
+- Abrir/Fechar atendimento (previsto no planejamento)
+- Ajustar tempo médio de serviço (previsto no planejamento)
 
 ---
 
@@ -120,10 +141,8 @@ nextcut/
 │   │   ├── pages/
 │   │   ├── components/
 │   │   ├── hooks/
-│   │   ├── context/
 │   │   ├── services/
 │   │   ├── routes/
-│   │   ├── utils/
 │   │   └── tests/
 │
 ├── backend/
@@ -239,7 +258,7 @@ sequenceDiagram
 
 # 🌐 Endpoints da API
 
-> Estado atual: backend base criado com Javalin e fila em memória. A integração JDBC/Supabase fica para depois da atividade #7, quando as tabelas estiverem prontas.
+Estado atual do backend:
 
 ## Cliente
 
@@ -255,6 +274,11 @@ POST /queue/leave/{phone}
 ```http
 POST /login
 POST /admin/next
+```
+
+Planejados para o painel administrativo:
+
+```http
 POST /admin/remove/{id}
 POST /admin/toggle
 ```
@@ -265,36 +289,14 @@ POST /admin/toggle
 /ws/queue
 ```
 
-## Rodar o backend localmente
-
-Pré-requisitos:
-
-* Java 17+
-* Maven 3.9+
-
-```bash
-cd backend
-mvn test
-mvn exec:java -Dexec.mainClass="com.nextcut.app.App"
-```
-
-Por padrão, a API sobe em:
-
-```http
-http://localhost:8080
-```
-
----
-
 # 🔐 Segurança
 
 ## Implementado:
 
 * BCrypt password hashing
-* Sanitização de dados
 * Validação de telefone
 * Proteção contra duplicidade
-* Sessão/JWT seguro
+* Token de sessão simples para o painel
 * Erros controlados
 
 ---
@@ -307,16 +309,15 @@ http://localhost:8080
 
 * QueueService
 * AuthService
-* DAO
+* DatabaseConfig
 * FIFO
-* Tempo estimado
+* Duplicidade por telefone
 
 ## Frontend
 
-* Formulários
-* Integração API
-* Estados de loading/error
-* Renderização
+* Componentes base
+* Renderização com Testing Library
+* Estados visuais de botao
 
 ```mermaid
 flowchart LR
@@ -341,7 +342,7 @@ Veja os arquivos de especificação para detalhes:
 
 # 📈 Roadmap
 
-## ✏️ Fase Atual: Design e Planejamento
+## ✏️ Fundação do Projeto
 
 * [x] Definição de arquitetura
 * [x] Especificação de requisitos
@@ -352,11 +353,12 @@ Veja os arquivos de especificação para detalhes:
 ## 🔨 Fase 1: MVP Core
 
 * [x] Estrutura base (frontend + backend)
-* [ ] Banco de dados (Supabase)
-* [ ] Login admin
-* [ ] Entrada na fila
-* [ ] Dashboard
-* [ ] Tempo real (WebSocket)
+* [x] Banco de dados via JDBC/PostgreSQL
+* [x] Login admin
+* [x] Entrada na fila
+* [x] Tela de acompanhamento
+* [x] Tempo real (WebSocket)
+* [ ] Completar endpoints administrativos de remover cliente e alternar atendimento
 
 ## 🚀 Fase 2: Melhorias
 
