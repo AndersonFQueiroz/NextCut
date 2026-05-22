@@ -63,6 +63,8 @@ com.nextcut
 
 ## 5. Endpoints
 
+### Implementados no backend atual
+
 ### Cliente
 - GET /
 - POST /queue/join
@@ -72,11 +74,13 @@ com.nextcut
 ### Barbeiro
 - POST /login
 - POST /admin/next
-- POST /admin/remove/{id}
-- POST /admin/toggle
 
 ### WebSocket
 - /ws/queue
+
+### Planejados para completar o painel administrativo
+- POST /admin/remove/{id}
+- POST /admin/toggle
 
 ---
 

@@ -34,4 +34,27 @@ public class InMemoryQueueEntryDao implements QueueEntryDao {
     public synchronized void update(QueueEntry entry) {
         entriesByPhone.put(entry.clientPhone(), entry);
     }
+
+    @Override
+    public synchronized void updateStatus(java.util.UUID id, QueueStatus status) {
+        entriesByPhone.values().stream()
+            .filter(e -> e.id().equals(id))
+            .findFirst()
+            .ifPresent(entry -> {
+                var calledAt = (status == QueueStatus.IN_SERVICE) ? java.time.Instant.now() : entry.calledAt();
+                entriesByPhone.put(entry.clientPhone(), entry.withStatus(status, calledAt));
+            });
+    }
+
+    @Override
+    public synchronized void updatePositions() {
+        var waiting = new ArrayList<>(findWaitingEntries());
+        waiting.sort(java.util.Comparator.comparing(QueueEntry::enteredAt));
+        
+        for (int i = 0; i < waiting.size(); i++) {
+            var entry = waiting.get(i);
+            var updated = entry.withPosition(i + 1);
+            entriesByPhone.put(updated.clientPhone(), updated);
+        }
+    }
 }

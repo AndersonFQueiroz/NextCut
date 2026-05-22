@@ -19,6 +19,10 @@ function maskPhone(value) {
 }
 
 function getErrorMessage(error) {
+  if (error.response?.status === 409) {
+    return 'Telefone já cadastrado na fila'
+  }
+
   if (typeof error.response?.data === 'string') {
     return error.response.data
   }

@@ -5,7 +5,7 @@ import com.nextcut.controller.ApiErrorResponse;
 import com.nextcut.controller.AuthController;
 import com.nextcut.controller.HealthController;
 import com.nextcut.controller.QueueController;
-import com.nextcut.dao.InMemoryQueueEntryDao;
+import com.nextcut.dao.JdbcQueueEntryDao;
 import com.nextcut.dao.JdbcAuthDao;
 import com.nextcut.service.AuthService;
 import com.nextcut.service.QueueService;
@@ -13,12 +13,17 @@ import com.nextcut.websocket.QueueWebSocket;
 import io.javalin.Javalin;
 import io.javalin.http.HttpResponseException;
 
+/**
+ * Fábrica responsável por instanciar e configurar o servidor Javalin.
+ * Centraliza a Injeção de Dependências e configurações globais de roteamento e exceções.
+ */
 public final class AppFactory {
     private AppFactory() {
     }
 
     public static Javalin create() {
-        var queueEntryDao = new InMemoryQueueEntryDao();
+        // Uso de JdbcQueueEntryDao para persistência real (F2 Corretude)
+        var queueEntryDao = new JdbcQueueEntryDao();
         var queueWebSocket = new QueueWebSocket();
         var queueService = new QueueService(queueEntryDao, queueWebSocket::broadcastSnapshot);
         var queueController = new QueueController(queueService);
