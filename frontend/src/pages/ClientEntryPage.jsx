@@ -1,7 +1,12 @@
+// Ícones utilizados na página de entrada do cliente
 import { Loader2, Phone, Scissors, User } from 'lucide-react'
-import { useState } from 'react'
+// useState guarda estados locais como nome, telefone, loading
+import { useState, useEffect } from 'react'
+// useNavigate permite redirecionar para a página de status após entrar
 import { useNavigate } from 'react-router-dom'
+// Logo utilizado no cabeçalho da página
 import nextCutLogo from '../assets/nextcut-logo.png'
+// api é a instância axios configurada para chamar o backend
 import api from '../services/api'
 
 function maskPhone(value) {
@@ -42,6 +47,8 @@ export default function ClientEntryPage() {
   const [errors, setErrors] = useState({})
   const [apiError, setApiError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // isOpen indica se a barbearia está aceitando clientes; true por padrão para não bloquear sem backend
+  const [isOpen, setIsOpen] = useState(true)
 
   const validate = () => {
     const nextErrors = {}
@@ -83,6 +90,31 @@ export default function ClientEntryPage() {
     }
   }
 
+  // useEffect busca o estado is_open no backend para bloquear o formulário quando fechado
+  useEffect(() => {
+    let mounted = true
+
+    // Tenta obter a rota pública /queue para ler o is_open quando disponível
+    api
+      .get('/queue')
+      .then((resp) => {
+        // payload aceita tanto ApiResponse quanto resposta direta
+        const payload = resp.data?.data ?? resp.data
+        // Interpreta campos possíveis que indicam se a barbearia está aberta
+        const open = Boolean(payload?.is_open ?? payload?.isOpen ?? payload?.open ?? true)
+        if (mounted) setIsOpen(open)
+      })
+      .catch(() => {
+        // Em erro, não bloqueia o formulário (fallback seguro)
+        if (mounted) setIsOpen(true)
+      })
+
+    // Cleanup para evitar setState após componente desmontar
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   return (
     <main
       className="relative min-h-screen overflow-hidden px-4 py-8 text-[var(--foreground)]"
@@ -110,6 +142,12 @@ export default function ClientEntryPage() {
             boxShadow: 'var(--shadow-wine)',
           }}
         >
+          {/* Quando a barbearia estiver fechada, mostramos um card centralizado avisando o usuário */}
+          {!isOpen ? (
+            <div className="mb-6 rounded-2xl border p-6 text-center backdrop-blur-sm" style={{ background: 'oklch(0.16 0.01 20 / 0.7)', borderColor: 'oklch(0.42 0.14 17 / 0.3)' }}>
+              <p className="text-lg font-semibold" style={{ color: 'oklch(0.86 0.08 25)' }}>Barbearia fechada no momento</p>
+            </div>
+          ) : null}
           <div className="flex items-start gap-3">
             <span
               className="flex h-10 w-10 flex-none items-center justify-center rounded-lg"
@@ -140,7 +178,9 @@ export default function ClientEntryPage() {
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Seu nome"
-                  className="h-12 w-full rounded-lg border bg-transparent pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-slate-500 transition-colors focus:border-[oklch(0.55_0.18_18)]"
+                  // Desabilita input quando barbearia estiver fechada
+                  disabled={!isOpen}
+                  className={`h-12 w-full rounded-lg border bg-transparent pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-slate-500 transition-colors focus:border-[oklch(0.55_0.18_18)] ${!isOpen ? 'opacity-50 pointer-events-none' : ''}`}
                   style={{ borderColor: errors.name ? 'oklch(0.58 0.2 25)' : 'oklch(0.3 0.02 20)' }}
                   aria-invalid={Boolean(errors.name)}
                 />
@@ -160,7 +200,9 @@ export default function ClientEntryPage() {
                   value={phone}
                   onChange={(event) => setPhone(maskPhone(event.target.value))}
                   placeholder="(00) 00000-0000"
-                  className="h-12 w-full rounded-lg border bg-transparent pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-slate-500 transition-colors focus:border-[oklch(0.55_0.18_18)]"
+                  // Desabilita input quando barbearia estiver fechada
+                  disabled={!isOpen}
+                  className={`h-12 w-full rounded-lg border bg-transparent pl-10 pr-4 text-sm text-[var(--foreground)] placeholder:text-slate-500 transition-colors focus:border-[oklch(0.55_0.18_18)] ${!isOpen ? 'opacity-50 pointer-events-none' : ''}`}
                   style={{ borderColor: errors.phone ? 'oklch(0.58 0.2 25)' : 'oklch(0.3 0.02 20)' }}
                   aria-invalid={Boolean(errors.phone)}
                 />
@@ -183,8 +225,9 @@ export default function ClientEntryPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-lg font-semibold uppercase tracking-widest text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
+              disabled={isSubmitting || !isOpen}
+              // Adiciona classes visuais quando desabilitado por fechamento
+              className={`flex h-12 w-full items-center justify-center gap-2 rounded-lg font-semibold uppercase tracking-widest text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100 ${!isOpen ? 'opacity-50 pointer-events-none' : ''}`}
               style={{ background: 'var(--gradient-wine)', boxShadow: 'var(--shadow-wine)' }}
             >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

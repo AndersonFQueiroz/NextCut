@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { LogOut, Phone, Scissors } from 'lucide-react'
 // useNavigate permite sair do painel e voltar para /login pelo React Router.
 import { useNavigate } from 'react-router-dom'
+// Componente de feedback visual que aparece no canto inferior direito
+import Toast from '../components/Toast'
 
 // API_BASE centraliza o endereço do backend para facilitar manutenção.
 const API_BASE = 'http://localhost:8080'
@@ -92,6 +94,16 @@ export default function AdminDashboardPage() {
   const [carregando, setCarregando] = useState(false)
   // erro guarda uma mensagem para mostrar quando alguma chamada da API falha.
   const [erro, setErro] = useState('')
+  // chamando indica se a ação de "chamar próximo" está em andamento
+  const [chamando, setChamando] = useState(false)
+  // removingId guarda o id do cliente que está sendo removido no momento
+  const [removingId, setRemovingId] = useState(null)
+  // toastVisivel controla se o Toast está visível
+  const [toastVisivel, setToastVisivel] = useState(false)
+  // toastMensagem guarda o texto a ser mostrado no Toast
+  const [toastMensagem, setToastMensagem] = useState('')
+  // toastTipo define se o toast é 'sucesso' ou 'erro'
+  const [toastTipo, setToastTipo] = useState('sucesso')
 
   // carregarFila busca a fila atual e é reutilizada pelo polling e pelos botões.
   const carregarFila = useCallback(async (mostrarCarregando = false) => {
@@ -167,6 +179,8 @@ export default function AdminDashboardPage() {
     const token = getToken()
     // Limpa erro antigo antes da ação.
     setErro('')
+    // Marca que a ação de chamar está em andamento para desabilitar o botão
+    setChamando(true)
 
     // try/catch trata falhas de backend ou rede.
     try {
@@ -186,9 +200,20 @@ export default function AdminDashboardPage() {
 
       // Atualiza a lista depois da ação para refletir o novo estado.
       await carregarFila(false)
+      // Mostra toast de sucesso curto quando a chamada conclui
+      setToastMensagem('Cliente chamado!')
+      setToastTipo('sucesso')
+      setToastVisivel(true)
     } catch {
       // Mostra erro simples quando a ação falha.
       setErro('Não foi possível chamar o próximo cliente.')
+      // Mostra toast de erro com mensagem amigável
+      setToastMensagem('Erro ao chamar próximo')
+      setToastTipo('erro')
+      setToastVisivel(true)
+    } finally {
+      // Finaliza o estado de chamada independente do resultado
+      setChamando(false)
     }
   }
 
@@ -229,6 +254,8 @@ export default function AdminDashboardPage() {
     const token = getToken()
     // Limpa erro antigo antes da nova tentativa.
     setErro('')
+    // Marca qual id está sendo removido para desabilitar apenas aquele botão
+    setRemovingId(id)
 
     // try/catch trata falhas sem quebrar a interface.
     try {
@@ -248,20 +275,37 @@ export default function AdminDashboardPage() {
 
       // Recarrega a fila depois de remover para atualizar os cards.
       await carregarFila(false)
+      // Mostra toast de sucesso após remover o cliente
+      setToastMensagem('Cliente removido')
+      setToastTipo('sucesso')
+      setToastVisivel(true)
     } catch {
       // Mostra mensagem de erro discreta para o barbeiro.
       setErro('Não foi possível remover o cliente.')
+      // Mostra toast de erro quando não for possível remover
+      setToastMensagem('Erro ao remover cliente')
+      setToastTipo('erro')
+      setToastVisivel(true)
+    } finally {
+      // Limpa o estado de remoção para reabilitar o botão
+      setRemovingId(null)
     }
   }
 
   // O return abaixo desenha toda a página do painel.
   return (
-    // main é o contêiner principal com fundo escuro radial e texto claro.
-    <main className="relative min-h-screen overflow-hidden px-4 py-8 text-white" style={{ background: 'var(--gradient-dark)' }}>
-      {/* Barra decorativa esquerda: absolute fixa no fundo, w-1 define largura pequena, h-full cobre a altura, e o background usa vinho. */}
+   <main className="relative min-h-screen overflow-hidden px-4 py-8 text-white" style={{ background: 'var(--gradient-dark)' }}>
+      {/* Barra decorativa esquerda */}
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
-      {/* Barra decorativa direita: replica a lateral vinho para manter identidade visual. */}
+      {/* Barra decorativa direita */}
       <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
+
+      {/* ✅ ADICIONA AQUI — Luz vermelha que emana de trás do conteúdo */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(110,8,18,0.55),transparent_75%)]" />
+
+      {/* ✅ ADICIONA AQUI — Escurecimento nas bordas para dar profundidade */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)]" />
+
       {/* Camada z-10 mantém o conteúdo acima das barras e do fundo. */}
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
         {/* Header do topo com marca, subtítulo e botão de saída. */}
@@ -285,21 +329,46 @@ export default function AdminDashboardPage() {
         {/* Área de controles principais do barbeiro. */}
         <section className="grid gap-4 md:grid-cols-2">
           {/* Botão grande que abre ou fecha o atendimento. */}
-          <button type="button" onClick={alternarAtendimento} className="h-12 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition" style={{ background: isOpen ? 'var(--gradient-wine)' : 'oklch(0.3 0.02 20)' }}>
-            {/* Bolinha indica o estado e o texto muda conforme isOpen. */}
+          <button
+            type="button"
+            onClick={alternarAtendimento}
+            // h-12 → altura do botão; rounded-lg → cantos arredondados; border → borda fina
+            className="h-12 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition"
+            // Altera o fundo inline conforme isOpen para seguir o padrão visual do projeto
+            style={{ background: isOpen ? 'var(--gradient-wine)' : 'oklch(0.3 0.02 20)' }}
+          >
+            {/* Indicador colorido à esquerda que segue a especificação (verde quando aberto) */}
+            {/* Texto do botão muda conforme isOpen; ● indica o estado visual */}
             {isOpen ? '● FECHAR ATENDIMENTO' : '● ABRIR ATENDIMENTO'}
           </button>
-          {/* Botão que chama o próximo cliente da fila. */}
-          <button type="button" onClick={chamarProximo} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition" style={{ background: 'var(--gradient-wine)' }}>
-            {/* Ícone Scissors identifica a ação do barbeiro e segue o padrão h-4 w-4. */}
-            <Scissors className="h-4 w-4 text-[var(--wine-glow)]" />
-            {/* Texto do botão principal da fila. */}
-            CHAMAR PRÓXIMO
+          {/* Botão que chama o próximo cliente da fila com estado de loading */}
+          <button
+            type="button"
+            onClick={chamarProximo}
+            // inline-flex → mantém ícone e texto alinhados; h-12 → altura do botão
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition"
+            // Mantém o visual principal do botão com o gradiente vinho do projeto
+            style={{ background: 'var(--gradient-wine)' }}
+            // Desabilita o botão enquanto a ação de chamar está em andamento
+            disabled={chamando}
+          >
+            {/* Spinner simples e icone quando chamando; segue cor variável do projeto */}
+            {chamando ? <svg className="h-4 w-4 animate-spin text-[var(--wine-glow)]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.25"/><path d="M22 12a10 10 0 00-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg> : <Scissors className="h-4 w-4 text-[var(--wine-glow)]" />}
+            {/* Texto muda para indicar a ação em progresso */}
+            {chamando ? 'CHAMANDO...' : 'CHAMAR PRÓXIMO'}
           </button>
         </section>
 
         {/* Mensagem de erro aparece somente quando erro não está vazio. */}
         {erro !== '' && <p className="text-sm font-medium text-red-400">{erro}</p>}
+
+        {/* Toast de feedback global, mostra sucesso/erro nas ações administrativas */}
+        <Toast
+          mensagem={toastMensagem}
+          tipo={toastTipo}
+          visivel={toastVisivel}
+          onFechar={() => setToastVisivel(false)}
+        />
 
         {/* Conteúdo principal da fila. */}
         <section className="space-y-4">
@@ -329,10 +398,18 @@ export default function AdminDashboardPage() {
                 // telefone é exibido como informação auxiliar do cliente.
                 const telefone = getClientPhone(cliente)
 
-                // Retorna um card para o cliente atual.
+                // Retorna um card para o cliente atual com possíveis badges para os 3 primeiros.
                 return (
                   // Card com rounded-2xl, borda vinho translúcida, fundo escuro translúcido e blur.
-                  <article key={`${id}-${index}`} className="rounded-2xl border border-[oklch(0.42_0.14_17_/_0.3)] p-5 backdrop-blur-sm" style={{ background: 'oklch(0.16 0.01 20 / 0.7)' }}>
+                  <article
+                    key={`${id}-${index}`}
+                    // Ajusta a borda do primeiro cliente para ficar mais brilhante conforme a especificação
+                    className="rounded-2xl border p-5 backdrop-blur-sm"
+                    style={{
+                      background: 'oklch(0.16 0.01 20 / 0.7)',
+                      borderColor: index === 0 ? 'oklch(0.55 0.18 18 / 0.8)' : 'oklch(0.42 0.14 17 / 0.3)',
+                    }}
+                  >
                     {/* Linha interna organiza senha, dados e ação remover. */}
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       {/* Bloco esquerdo com senha e dados do cliente. */}
@@ -351,13 +428,26 @@ export default function AdminDashboardPage() {
                             {telefone}
                           </p>
                           {/* Tag de posição mostra a ordem do cliente na fila. */}
-                          <span className="mt-2 inline-flex rounded-full border border-[oklch(0.42_0.14_17_/_0.3)] px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.65 0.01 20)' }}>Posição {index + 1}</span>
+                          <span className="mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.65 0.01 20)', borderColor: 'oklch(0.42 0.14 17 / 0.3)' }}>Posição {index + 1}</span>
+
+                          {/* Badges especiais para os 3 primeiros: index 0 => PRÓXIMO ; index 1-2 => EM BREVE */}
+                          {index === 0 ? (
+                            <span className="mt-2 ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ background: 'var(--gradient-wine)', color: 'white' }}>PRÓXIMO</span>
+                          ) : index === 1 || index === 2 ? (
+                            <span className="mt-2 ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ border: '1px solid oklch(0.42 0.14 17 / 0.5)', color: 'var(--wine-glow)' }}>EM BREVE</span>
+                          ) : null}
                         </div>
                       </div>
-                      {/* Botão vermelho discreto para remover o cliente atual. */}
-                      <button type="button" onClick={() => removerCliente(id)} className="h-10 rounded-lg border border-red-400/40 bg-transparent px-4 text-xs font-semibold uppercase tracking-widest text-red-400 transition hover:border-red-400 hover:text-white">
-                        {/* Texto da ação de remoção. */}
-                        Remover
+                      {/* Botão vermelho discreto para remover o cliente atual, com estado por linha. */}
+                      <button
+                        type="button"
+                        onClick={() => removerCliente(id)}
+                        // Apenas o botão da linha removida fica desabilitado enquanto a requisição está em andamento
+                        disabled={removingId === id}
+                        className="h-10 rounded-lg border border-red-400/40 bg-transparent px-4 text-xs font-semibold uppercase tracking-widest text-red-400 transition hover:border-red-400 hover:text-white disabled:opacity-50 disabled:pointer-events-none"
+                      >
+                        {/* Texto muda para indicar remoção quando a ação estiver em progresso */}
+                        {removingId === id ? 'Removendo...' : 'Remover'}
                       </button>
                     </div>
                   </article>
