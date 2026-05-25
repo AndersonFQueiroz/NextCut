@@ -1,7 +1,7 @@
-// Route define cada caminho da aplicação; Routes escolhe qual Route renderizar.
 import { Route, Routes } from 'react-router-dom'
 // ClientEntryPage é a página pública de entrada do cliente na fila.
 import ClientEntryPage from './pages/ClientEntryPage'
+import OtpVerificationPage from './pages/OtpVerificationPage'
 // LoginPage é a página onde o barbeiro informa usuário e senha.
 import LoginPage from './pages/LoginPage'
 // QueueStatusPage é a página pública para consultar o status da fila.
@@ -21,6 +21,8 @@ export default function App() {
       <Route path="/" element={<ClientEntryPage />} />
       {/* Rota /entrada pública: alternativa explícita para a entrada do cliente. */}
       <Route path="/entrada" element={<ClientEntryPage />} />
+      {/* Rota /verificar pública: tela para confirmar OTP via WhatsApp */}
+      <Route path="/verificar" element={<OtpVerificationPage />} />
       {/* Rota /fila pública: mostra o status da fila para clientes. */}
       <Route path="/fila" element={<QueueStatusPage />} />
       {/* Rota /login pública: mostra o formulário de autenticação do barbeiro. */}

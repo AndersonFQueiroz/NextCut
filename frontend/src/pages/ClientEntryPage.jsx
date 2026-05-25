@@ -40,6 +40,17 @@ function getErrorMessage(error) {
   )
 }
 
+/**
+ * @component ClientEntryPage
+ * @description
+ * Página inicial pública onde o cliente informa seu nome e telefone para entrar na fila.
+ * Se a barbearia estiver fechada (is_open=false retornado pela API), o formulário é bloqueado.
+ * 
+ * Lógica de Negócio:
+ * - Em vez de colocar o cliente direto na fila, este componente dispara a rota /queue/request-otp.
+ * - Os dados de estado (nome, telefone) são passados via React Router `state` para a tela 
+ *   de verificação OTP (OtpVerificationPage), onde a autenticação real de número ocorre.
+ */
 export default function ClientEntryPage() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
@@ -76,13 +87,18 @@ export default function ClientEntryPage() {
     setIsSubmitting(true)
 
     try {
-      await api.post('/queue/join', {
+      await api.post('/queue/request-otp', {
         clientName: name.trim(),
         clientPhone: phone,
       })
 
-      sessionStorage.setItem('nextcut.clientPhone', phone)
-      navigate(`/fila?phone=${encodeURIComponent(phone)}`, { state: { phone } })
+      // Redireciona para a tela de verificação passando os dados via state
+      navigate('/verificar', { 
+        state: { 
+          clientName: name.trim(), 
+          clientPhone: phone 
+        } 
+      })
     } catch (error) {
       setApiError(getErrorMessage(error))
     } finally {

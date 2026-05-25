@@ -9,10 +9,15 @@ import com.nextcut.controller.QueueController;
 import com.nextcut.dao.JdbcQueueEntryDao;
 import com.nextcut.dao.JdbcAuthDao;
 import com.nextcut.service.AuthService;
+import com.nextcut.service.OtpService;
 import com.nextcut.service.QueueService;
 import com.nextcut.websocket.QueueWebSocket;
 import io.javalin.Javalin;
 import io.javalin.http.HttpResponseException;
+import io.javalin.json.JavalinJackson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * Fábrica responsável por instanciar e configurar o servidor Javalin.
@@ -27,7 +32,8 @@ public final class AppFactory {
         var authDao = new JdbcAuthDao();
         var queueWebSocket = new QueueWebSocket();
         var queueService = new QueueService(queueEntryDao, authDao, queueWebSocket::broadcastSnapshot);
-        var queueController = new QueueController(queueService);
+        var otpService = new OtpService();
+        var queueController = new QueueController(queueService, otpService);
 
         var authService = new AuthService(authDao);
         var authController = new AuthController(authService);
@@ -36,6 +42,14 @@ public final class AppFactory {
         return Javalin.create(config -> {
             config.startup.showJavalinBanner = false;
             
+            // Configura Jackson para suportar Java 8 Time API (Instant, LocalDate, etc)
+            config.jsonMapper(new JavalinJackson(
+                new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
+                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS),
+                false
+            ));
+
             // Habilita CORS para o frontend local (Vite/React) acessar a API
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> it.anyHost());
