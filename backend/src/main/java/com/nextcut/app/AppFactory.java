@@ -35,6 +35,12 @@ public final class AppFactory {
 
         return Javalin.create(config -> {
             config.startup.showJavalinBanner = false;
+            
+            // Habilita CORS para o frontend local (Vite/React) acessar a API
+            config.bundledPlugins.enableCors(cors -> {
+                cors.addRule(it -> it.anyHost());
+            });
+
             config.routes.get("/", ctx -> ctx.json(ApiResponse.ok(new ApiInfo("NextCut API", "running"))));
             HealthController.register(config.routes);
             queueController.register(config.routes);
