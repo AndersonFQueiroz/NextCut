@@ -89,13 +89,19 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.3</version>
-                <configuration>
-                    <argLine>-Dnet.bytebuddy.experimental=true</argLine>
-                </configuration>
-            </plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.5.3</version>
+    <configuration>
+        <!-- argLine passa argumentos para a JVM durante os testes -->
+        <argLine>-Dnet.bytebuddy.experimental=true</argLine>
+        <!-- excludes ignora os testes de integração no CI pois dependem -->
+        <!-- do backend rodando localmente (tarefas #25 #26 #28 pendentes) -->
+        <excludes>
+            <exclude>**/integration/**</exclude>
+        </excludes>
+    </configuration>
+</plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
