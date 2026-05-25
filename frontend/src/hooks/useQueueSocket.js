@@ -18,14 +18,25 @@ function buildQueueSocketUrl() {
   return url.toString()
 }
 
-function findEntryByPhone(snapshot, phone) {
+function findEntryByPhone(data, phone) {
   const normalizedPhone = normalizePhone(phone)
 
-  if (!normalizedPhone || !Array.isArray(snapshot?.entries)) {
-    return null
-  }
+  if (!normalizedPhone) return null
 
-  return snapshot.entries.find((entry) => normalizePhone(entry.clientPhone) === normalizedPhone) || null
+  // Extrai a lista do payload do WebSocket (data.payload.queue) ou diretamente do data.queue
+  const queueList = data?.payload?.queue || data?.queue || data?.entries
+  const inService = data?.payload?.inServiceEntry || data?.inServiceEntry
+
+  let found = null
+  if (Array.isArray(queueList)) {
+    found = queueList.find((entry) => normalizePhone(entry.clientPhone) === normalizedPhone)
+  }
+  
+  if (!found && inService && normalizePhone(inService.clientPhone) === normalizedPhone) {
+    found = inService
+  }
+  
+  return found || null
 }
 
 export default function useQueueSocket(phone) {

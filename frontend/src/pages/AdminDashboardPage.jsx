@@ -6,6 +6,7 @@ import { LogOut, Phone, Scissors } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 // Componente de feedback visual que aparece no canto inferior direito
 import Toast from '../components/Toast'
+import logoLogin from '../assets/logo_login.png'
 
 // API_BASE centraliza o endereço do backend para facilitar manutenção.
 const API_BASE = 'http://localhost:8080'
@@ -82,12 +83,23 @@ function getClientPhone(cliente) {
   return cliente.telefone ?? cliente.phone ?? cliente.clientPhone ?? 'Telefone não informado'
 }
 
-// AdminDashboardPage renderiza o painel do barbeiro pedido na tarefa #14.
+/**
+ * @component AdminDashboardPage
+ * @description
+ * Painel administrativo do barbeiro para gerenciar a fila (tarefa #14).
+ * 
+ * Lógica de Negócio e Arquitetura:
+ * - Realiza polling (setInterval) a cada 5 segundos para garantir que a fila
+ *   esteja sempre sincronizada com o backend, mesmo que o WebSocket falhe.
+ * - Gerencia os status `WAITING` (Fila atual) e `IN_SERVICE` (Cliente na cadeira).
+ * - Todas as ações sensíveis (chamar próximo, remover, alternar atendimento)
+ *   exigem um token Bearer, validado pelo backend via `AuthService`.
+ */
 export default function AdminDashboardPage() {
   // navigate muda de rota sem recarregar a página, usado no botão Sair.
   const navigate = useNavigate()
-  // fila guarda a lista de clientes retornada pela API; começa como array vazio.
   const [fila, setFila] = useState([])
+  const [inService, setInService] = useState(null)
   // isOpen informa se o atendimento está aberto; começa false até a API confirmar.
   const [isOpen, setIsOpen] = useState(false)
   // carregando controla o texto "Carregando fila..." no lugar da lista.
@@ -142,6 +154,8 @@ export default function AdminDashboardPage() {
       const data = await resposta.json()
       // Atualiza o estado fila com a lista normalizada.
       setFila(normalizeQueue(data))
+      // Atualiza o estado inService com o valor que veio da API
+      setInService(data?.data?.inServiceEntry || data?.inServiceEntry || null)
       // Atualiza o estado isOpen com o valor normalizado.
       setIsOpen(normalizeIsOpen(data))
       // Limpa erro anterior quando a chamada dá certo.
@@ -212,7 +226,34 @@ export default function AdminDashboardPage() {
       setToastTipo('erro')
       setToastVisivel(true)
     } finally {
-      // Finaliza o estado de chamada independente do resultado
+      // Libera o botão de chamar após terminar (sucesso ou erro).
+      setChamando(false)
+    }
+  }
+
+  // finalizarAtual chama o endpoint /admin/finish para concluir o atendimento de quem está na cadeira
+  async function finalizarAtual() {
+    setChamando(true)
+    setErro('')
+    try {
+      const token = getToken()
+      const resposta = await fetch(`${API_BASE}/admin/finish`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!resposta.ok) {
+        throw new Error('Erro ao finalizar atendimento.')
+      }
+      await carregarFila(false)
+      setToastMensagem('Atendimento finalizado')
+      setToastTipo('sucesso')
+      setToastVisivel(true)
+    } catch {
+      setErro('Não foi possível finalizar o atendimento.')
+      setToastMensagem('Erro ao finalizar')
+      setToastTipo('erro')
+      setToastVisivel(true)
+    } finally {
       setChamando(false)
     }
   }
@@ -313,9 +354,14 @@ export default function AdminDashboardPage() {
           {/* Bloco da marca e nome da tela. */}
           <div>
             {/* Título NextCut usa a fonte display Cinzel definida em --font-display. */}
-            <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>NextCut</h1>
+            <div className="flex items-center gap-3">
+              <img src={logoLogin} alt="NextCut Logo" className="h-10 object-contain" />
+              <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>NextCut</h1>
+            </div>
             {/* Texto auxiliar usa o brilho vinho para destacar o painel do barbeiro. */}
-            <p className="mt-1 text-sm font-semibold uppercase tracking-widest" style={{ color: 'var(--wine-glow)' }}>Painel do Barbeiro</p>
+            <p className="mt-1 text-sm font-semibold uppercase tracking-widest" style={{ color: 'var(--wine-glow)' }}>
+              Painel do Barbeiro {localStorage.getItem('nextcut_adminName') ? `- Olá, ${localStorage.getItem('nextcut_adminName')}` : ''}
+            </p>
           </div>
           {/* Botão Sair remove o token e volta para /login. */}
           <button type="button" onClick={sair} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] bg-transparent px-5 text-sm font-semibold uppercase tracking-widest text-white transition hover:border-[var(--wine-glow)]">
@@ -346,21 +392,61 @@ export default function AdminDashboardPage() {
             type="button"
             onClick={chamarProximo}
             // inline-flex → mantém ícone e texto alinhados; h-12 → altura do botão
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition disabled:opacity-50 disabled:cursor-not-allowed"
             // Mantém o visual principal do botão com o gradiente vinho do projeto
             style={{ background: 'var(--gradient-wine)' }}
-            // Desabilita o botão enquanto a ação de chamar está em andamento
-            disabled={chamando}
+            // Desabilita o botão enquanto a ação de chamar está em andamento, ou se houver cliente em atendimento
+            disabled={chamando || inService != null}
           >
             {/* Spinner simples e icone quando chamando; segue cor variável do projeto */}
-            {chamando ? <svg className="h-4 w-4 animate-spin text-[var(--wine-glow)]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.25"/><path d="M22 12a10 10 0 00-10-10" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg> : <Scissors className="h-4 w-4 text-[var(--wine-glow)]" />}
-            {/* Texto muda para indicar a ação em progresso */}
-            {chamando ? 'CHAMANDO...' : 'CHAMAR PRÓXIMO'}
+            {chamando ? (
+              <span className="flex items-center gap-2">
+                <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                CHAMANDO...
+              </span>
+            ) : (
+              'CHAMAR PRÓXIMO'
+            )}
           </button>
         </section>
 
-        {/* Mensagem de erro aparece somente quando erro não está vazio. */}
+        {/* MENSAGEM DE ERRO (se houver) */}
         {erro !== '' && <p className="text-sm font-medium text-red-400">{erro}</p>}
+
+        {/* BLOCO DE EM ATENDIMENTO */}
+        {inService && (
+          <section className="rounded-2xl border border-[var(--wine-glow)] p-6 shadow-[var(--shadow-wine)] relative overflow-hidden bg-black/40">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(110,8,18,0.3),transparent_70%)]" />
+            <div className="relative z-10">
+              <h2 className="text-xl font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Em Atendimento
+              </h2>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <div className="text-2xl font-light text-stone-100" style={{ fontFamily: 'var(--font-display)' }}>
+                    {inService.clientName}
+                  </div>
+                  <div className="text-sm font-semibold tracking-widest text-[var(--wine-glow)] mt-1">
+                    {getClientPhone(inService)}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={finalizarAtual}
+                  disabled={chamando}
+                  className="h-10 rounded-lg px-6 text-sm font-semibold uppercase tracking-widest text-white transition disabled:opacity-50 border border-green-600/50 hover:border-green-500"
+                  style={{ background: 'linear-gradient(135deg, rgba(22,101,52,0.8), rgba(21,128,61,0.8))' }}
+                >
+                  Finalizar Atendimento
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Toast de feedback global, mostra sucesso/erro nas ações administrativas */}
         <Toast

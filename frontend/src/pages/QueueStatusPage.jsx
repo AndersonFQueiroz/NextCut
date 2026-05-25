@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowLeft, Clock, Loader2, LogOut, Phone, Ticket } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import nextCutLogo from '../assets/nextcut-logo.png'
 import useQueueSocket from '../hooks/useQueueSocket'
@@ -84,13 +84,22 @@ export default function QueueStatusPage() {
     try {
       await api.post(`/queue/leave/${encodeURIComponent(phone)}`)
       sessionStorage.removeItem('nextcut.clientPhone')
-      setMessage('Voce saiu da fila.')
+      // Redireciona imediatamente para a tela inicial
+      navigate('/entrada')
     } catch (requestError) {
       setError(getErrorMessage(requestError))
-    } finally {
       setIsLeaving(false)
     }
   }
+
+  // Se o cliente foi removido pelo admin (ou seja, tem snapshot mas não tem mais entry),
+  // redireciona de volta para a tela inicial
+  useEffect(() => {
+    if (hasSnapshot && !queueEntry && !isLeaving) {
+      sessionStorage.removeItem('nextcut.clientPhone')
+      navigate('/entrada')
+    }
+  }, [hasSnapshot, queueEntry, isLeaving, navigate])
 
   const estimatedTime = queueEntry?.position ? `${Math.max(queueEntry.position - 1, 0) * 15} min` : '--'
 
@@ -124,8 +133,9 @@ export default function QueueStatusPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h1 className="text-xl font-medium text-[var(--foreground)]" style={{ fontFamily: 'var(--font-display)' }}>
-                Status da fila
+                {queueEntry?.clientName ? `Olá, ${queueEntry.clientName} - Status da fila` : 'Status da fila'}
               </h1>
+
               <div className="mt-2 flex items-center gap-2 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
                 <Phone className="h-4 w-4 text-[var(--wine-glow)]" />
                 <span>{phone || 'Telefone nao informado'}</span>
@@ -160,11 +170,20 @@ export default function QueueStatusPage() {
           {isLoading ? (
             <QueueStatusSkeleton />
           ) : (
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              <MetricCard icon={Ticket} label="Senha" value={queueEntry?.ticketNumber ?? '--'} />
-              <MetricCard icon={LogOut} label="Posicao" value={queueEntry?.position ? `${queueEntry.position}a` : '--'} />
-              <MetricCard icon={Clock} label="Estimativa" value={estimatedTime} />
-            </div>
+            queueEntry?.status === 'IN_SERVICE' ? (
+              <div className="mt-8 rounded-xl p-6 text-center shadow-[var(--shadow-wine)] transition-all" style={{ background: 'var(--gradient-wine)' }}>
+                <h2 className="text-2xl font-bold uppercase tracking-widest text-white">Chegou sua vez!</h2>
+                <p className="mt-2 text-sm text-stone-200">
+                  O barbeiro já está te aguardando na cadeira.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                <MetricCard icon={Ticket} label="Senha" value={queueEntry?.ticketNumber ?? '--'} />
+                <MetricCard icon={LogOut} label="Posicao" value={queueEntry?.position ? `${queueEntry.position}a` : '--'} />
+                <MetricCard icon={Clock} label="Estimativa" value={estimatedTime} />
+              </div>
+            )
           )}
 
           {pageError ? (

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react' // useState guarda valores que mudam na tela; FormEvent tipa o envio do formulário em TypeScript.
 import { CalendarCheck, Lock, Mail, User } from 'lucide-react' // Ícones visuais usados no card, nos inputs e no botão social da tela de login.
 import { useNavigate } from 'react-router-dom' // useNavigate permite trocar de rota pelo JavaScript sem recarregar a página inteira.
-import nextCutLogo from '../../novo logo.png' // Importa a imagem da logo para o Vite gerar o caminho correto no navegador.
+import nextCutLogo from '../assets/logo_login.png' // Importa a imagem da logo para o Vite gerar o caminho correto no navegador.
 
 export function LoginPage() {
   const navigate = useNavigate() // Cria a função navigate para mandar o barbeiro para /admin depois do login.
@@ -30,6 +30,7 @@ export function LoginPage() {
       const dados = await resposta.json() // Converte o corpo JSON da resposta em objeto JavaScript para acessar o token.
       const token = dados.token ?? dados.data?.token // Aceita token direto ou dentro de data, porque o backend atual usa ApiResponse com data.token.
       localStorage.setItem('nextcut_token', token) // localStorage.setItem salva o token no navegador para manter a sessão do barbeiro.
+      localStorage.setItem('nextcut_adminName', username) // Salva o nome do barbeiro para mostrar no painel.
       navigate('/admin') // Navega para o painel protegido depois que o token foi salvo com sucesso.
     } catch { // catch roda quando o fetch falha por rede, backend desligado ou JSON inválido.
       setErro('Usuário ou senha inválidos.') // Usa a mesma mensagem simples para não expor detalhes técnicos ao usuário.
@@ -59,7 +60,7 @@ export function LoginPage() {
               <CalendarCheck className="h-5 w-5 text-stone-100" />
             </span>
             <div>
-              <h1 className="font-serif text-xl font-bold tracking-normal text-stone-50">
+              <h1 className="text-xl font-medium text-[var(--foreground)]" style={{ fontFamily: 'var(--font-display)' }}>
                 Acesso restrito
               </h1>
               <p className="mt-2 text-sm text-stone-400">Veja a agenda e os atendimentos do dia</p>

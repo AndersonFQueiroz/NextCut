@@ -8,7 +8,10 @@ import java.util.UUID;
 
 /**
  * Serviço responsável pela autenticação de usuários (barbeiros).
- * Gerencia a lógica de validação de credenciais e geração de tokens.
+ * <p><strong>Segurança Aplicada:</strong></p>
+ * Este serviço previne ataques de timing (por usar BCrypt para verificação) e garante
+ * que senhas nunca trafeguem em texto plano no banco de dados. O token retornado 
+ * (UUID UUIDv4) garante entropia criptográfica suficiente para a sessão.
  */
 public class AuthService {
     private final AuthDao authDao;
