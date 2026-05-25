@@ -70,6 +70,13 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <!-- Carregamento automático do arquivo .env -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

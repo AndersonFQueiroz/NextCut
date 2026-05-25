@@ -14,6 +14,10 @@ public final class DatabaseConfig {
     public static Connection getConnection() throws SQLException {
         var databaseUrl = System.getenv(DATABASE_URL_ENV);
         if (databaseUrl == null || databaseUrl.isBlank()) {
+            // Fallback para System properties (carregado pelo EnvLoader via .env)
+            databaseUrl = System.getProperty(DATABASE_URL_ENV);
+        }
+        if (databaseUrl == null || databaseUrl.isBlank()) {
             throw new IllegalStateException("DATABASE_URL environment variable is required");
         }
 

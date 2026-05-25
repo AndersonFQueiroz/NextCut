@@ -6,6 +6,10 @@ public record AppProperties(int port) {
     public static AppProperties fromEnvironment() {
         var rawPort = System.getenv("PORT");
         if (rawPort == null || rawPort.isBlank()) {
+            // Fallback para System properties (carregado pelo EnvLoader via .env)
+            rawPort = System.getProperty("PORT");
+        }
+        if (rawPort == null || rawPort.isBlank()) {
             return new AppProperties(DEFAULT_PORT);
         }
 
