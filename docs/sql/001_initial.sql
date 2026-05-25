@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS queue_entries (
 );
 
 -- ÍNDICES
-CREATE UNIQUE INDEX IF NOT EXISTS uq_phone_per_day
-    ON queue_entries (client_phone, entered_date);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_phone_per_day_waiting
+    ON queue_entries (client_phone, entered_date) WHERE status IN ('WAITING', 'IN_SERVICE');
 CREATE INDEX IF NOT EXISTS idx_queue_phone    ON queue_entries (client_phone);
 CREATE INDEX IF NOT EXISTS idx_queue_status   ON queue_entries (status);
 CREATE INDEX IF NOT EXISTS idx_queue_position ON queue_entries (position);
@@ -107,7 +107,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE barber;
 INSERT INTO barber (username, password_hash, avg_service_minutes, is_open)
 VALUES (
     'admin',
-    '$2a$12$eixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW',
+    '$2a$12$bXe43zMC0VJiZ1j55MW0zuFyGMyyEMKvDa4XjS.1Y1rsMj0ILcjpu',
     20,
     FALSE
 )

@@ -31,6 +31,11 @@ public class AdminController {
             ctx.json(ApiResponse.ok(entry));
         });
 
+        routes.post("/admin/finish", ctx -> {
+            var entry = queueService.finishCurrent();
+            ctx.json(ApiResponse.ok(entry));
+        });
+
         routes.post("/admin/toggle", ctx -> {
             var newStatus = authDao.toggleShopStatus();
             queueService.triggerBroadcast();

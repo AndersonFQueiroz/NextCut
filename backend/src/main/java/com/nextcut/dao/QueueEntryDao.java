@@ -12,6 +12,8 @@ public interface QueueEntryDao {
 
     List<QueueEntry> findWaitingEntries();
 
+    Optional<QueueEntry> findInServiceEntry();
+
     void update(QueueEntry entry);
 
     void updateStatus(java.util.UUID id, com.nextcut.model.QueueStatus status);

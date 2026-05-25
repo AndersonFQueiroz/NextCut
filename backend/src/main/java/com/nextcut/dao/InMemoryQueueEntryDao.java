@@ -31,6 +31,13 @@ public class InMemoryQueueEntryDao implements QueueEntryDao {
     }
 
     @Override
+    public synchronized Optional<QueueEntry> findInServiceEntry() {
+        return entriesByPhone.values().stream()
+            .filter(entry -> entry.status() == QueueStatus.IN_SERVICE)
+            .findFirst();
+    }
+
+    @Override
     public synchronized void update(QueueEntry entry) {
         entriesByPhone.put(entry.clientPhone(), entry);
     }

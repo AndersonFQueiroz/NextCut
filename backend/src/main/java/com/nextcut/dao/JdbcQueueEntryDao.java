@@ -106,6 +106,33 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
     }
 
     /**
+     * Retorna o cliente que está atualmente em atendimento.
+     * @return Optional contendo a entrada com status IN_SERVICE.
+     */
+    @Override
+    public Optional<QueueEntry> findInServiceEntry() {
+        var sql = """
+                SELECT id, ticket_number, client_name, client_phone,
+                       status, position, entered_at, called_at
+                FROM queue_entries
+                WHERE status = 'IN_SERVICE'
+                  AND entered_date = CURRENT_DATE
+                ORDER BY called_at DESC
+                LIMIT 1
+                """;
+        try (var conn = DatabaseConfig.getConnection();
+             var stmt = conn.prepareStatement(sql);
+             var rs = stmt.executeQuery()) {
+
+            if (rs.next()) return Optional.of(mapRow(rs));
+            return Optional.empty();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar cliente em atendimento: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Atualiza os dados de uma entrada existente (status, posição e data de chamada).
      * @param entry Objeto QueueEntry com os dados atualizados.
      */
@@ -189,6 +216,33 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao recalcular posições da fila: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Busca uma entrada pelo seu ID único.
+     * @param id UUID da entrada.
+     * @return Optional contendo a entrada se encontrada.
+     */
+    @Override
+    public Optional<QueueEntry> findById(UUID id) {
+        var sql = """
+                SELECT id, ticket_number, client_name, client_phone,
+                       status, position, entered_at, called_at
+                FROM queue_entries
+                WHERE id = ?
+                """;
+        try (var conn = DatabaseConfig.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, id);
+            try (var rs = stmt.executeQuery()) {
+                if (rs.next()) return Optional.of(mapRow(rs));
+                return Optional.empty();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar entrada por ID: " + e.getMessage(), e);
         }
     }
 
