@@ -4,7 +4,6 @@ import com.nextcut.dao.AuthDao;
 import com.nextcut.dao.InMemoryQueueEntryDao;
 import com.nextcut.model.QueueJoinRequest;
 import io.javalin.http.BadRequestResponse;
-import io.javalin.http.ConflictResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -35,17 +34,23 @@ class QueueServiceTest {
         assertEquals(1, service.statusByPhone("(11) 99999-0002").position());
     }
 
+    /**
+     * Testa o comportamento idempotente do join():
+     * Quando um telefone já está na fila (WAITING), o sistema retorna a entry
+     * existente ao invés de lançar exceção — isso melhora a UX permitindo
+     * que o cliente recupere seu acompanhamento sem erro.
+     */
     @Test
-    void rejectsDuplicatedWaitingPhone() {
+    void returnsExistingEntryForDuplicatedWaitingPhone() {
         var service = new QueueService(new InMemoryQueueEntryDao(), mockAuthDao(), snapshot -> {
         });
 
-        service.join(new QueueJoinRequest("Ana", "(11) 99999-0001"));
+        var first = service.join(new QueueJoinRequest("Ana", "(11) 99999-0001"));
+        var duplicate = service.join(new QueueJoinRequest("Ana Silva", "11999990001"));
 
-        assertThrows(
-            ConflictResponse.class,
-            () -> service.join(new QueueJoinRequest("Ana Silva", "11999990001"))
-        );
+        // Deve retornar a mesma entry (mesmo ID e ticket), não criar uma nova
+        assertEquals(first.id(), duplicate.id());
+        assertEquals(first.ticketNumber(), duplicate.ticketNumber());
     }
 
     @Test
