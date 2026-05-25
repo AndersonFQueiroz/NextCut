@@ -57,4 +57,11 @@ public class InMemoryQueueEntryDao implements QueueEntryDao {
             entriesByPhone.put(updated.clientPhone(), updated);
         }
     }
+
+    @Override
+    public synchronized Optional<QueueEntry> findById(java.util.UUID id) {
+        return entriesByPhone.values().stream()
+            .filter(e -> e.id().equals(id))
+            .findFirst();
+    }
 }

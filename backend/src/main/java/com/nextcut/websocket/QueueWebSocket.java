@@ -1,6 +1,7 @@
 package com.nextcut.websocket;
 
 import com.nextcut.model.QueueSnapshot;
+import com.nextcut.model.WsMessage;
 import com.nextcut.service.QueueService;
 import io.javalin.config.RoutesConfig;
 import io.javalin.websocket.WsContext;
@@ -12,18 +13,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * Gerenciador de conexões WebSocket para atualizações em tempo real.
  * Mantém uma lista de sessões ativas (clientes conectados) e envia notificações 
  * automáticas (broadcast) sempre que o estado da fila é alterado.
+ *
+ * Formato de mensagem: { "event": "QUEUE_UPDATED", "payload": { ... } }
  */
 public class QueueWebSocket {
     private final Set<WsContext> clients = ConcurrentHashMap.newKeySet();
 
     /**
      * Registra o endpoint do WebSocket e gerencia o ciclo de vida das conexões.
+     * Ao conectar, o cliente recebe imediatamente o estado atual da fila.
      */
     public void register(RoutesConfig routes, QueueService queueService) {
         routes.ws("/ws/queue", ws -> {
             ws.onConnect(ctx -> {
                 clients.add(ctx);
-                ctx.send(queueService.snapshot());
+                ctx.send(WsMessage.queueUpdated(queueService.snapshot()));
             });
             ws.onClose(ctx -> clients.remove(ctx));
             ws.onError(ctx -> clients.remove(ctx));
@@ -38,6 +42,7 @@ public class QueueWebSocket {
      */
     public void broadcastSnapshot(QueueSnapshot snapshot) {
         clients.removeIf(ctx -> !ctx.session.isOpen());
-        clients.forEach(ctx -> ctx.send(snapshot));
+        var message = WsMessage.queueUpdated(snapshot);
+        clients.forEach(ctx -> ctx.send(message));
     }
 }

@@ -2,6 +2,7 @@ package com.nextcut.app;
 
 import com.nextcut.controller.ApiResponse;
 import com.nextcut.controller.ApiErrorResponse;
+import com.nextcut.controller.AdminController;
 import com.nextcut.controller.AuthController;
 import com.nextcut.controller.HealthController;
 import com.nextcut.controller.QueueController;
@@ -22,15 +23,15 @@ public final class AppFactory {
     }
 
     public static Javalin create() {
-        // Uso de JdbcQueueEntryDao para persistência real (F2 Corretude)
         var queueEntryDao = new JdbcQueueEntryDao();
+        var authDao = new JdbcAuthDao();
         var queueWebSocket = new QueueWebSocket();
-        var queueService = new QueueService(queueEntryDao, queueWebSocket::broadcastSnapshot);
+        var queueService = new QueueService(queueEntryDao, authDao, queueWebSocket::broadcastSnapshot);
         var queueController = new QueueController(queueService);
 
-        var authDao = new JdbcAuthDao();
         var authService = new AuthService(authDao);
         var authController = new AuthController(authService);
+        var adminController = new AdminController(queueService, authDao);
 
         return Javalin.create(config -> {
             config.startup.showJavalinBanner = false;
@@ -38,6 +39,7 @@ public final class AppFactory {
             HealthController.register(config.routes);
             queueController.register(config.routes);
             authController.register(config.routes);
+            adminController.register(config.routes);
             queueWebSocket.register(config.routes, queueService);
 
             config.routes.exception(HttpResponseException.class, (e, ctx) -> {

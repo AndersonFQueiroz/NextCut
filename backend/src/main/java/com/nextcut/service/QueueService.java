@@ -1,5 +1,6 @@
 package com.nextcut.service;
 
+import com.nextcut.dao.AuthDao;
 import com.nextcut.dao.QueueEntryDao;
 import com.nextcut.model.QueueEntry;
 import com.nextcut.model.QueueJoinRequest;
@@ -24,21 +25,18 @@ import java.util.function.Consumer;
  */
 public class QueueService {
     private final QueueEntryDao queueEntryDao;
+    private final AuthDao authDao;
     private final Consumer<QueueSnapshot> queueNotifier;
     private final ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
     private int nextTicketNumber = 1;
 
-    public QueueService(QueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
+    public QueueService(QueueEntryDao queueEntryDao, AuthDao authDao, Consumer<QueueSnapshot> queueNotifier) {
         this.queueEntryDao = queueEntryDao;
+        this.authDao = authDao;
         this.queueNotifier = queueNotifier;
         restoreWaitingQueue();
     }
 
-    /**
-     * Adiciona um novo cliente à fila (FIFO).
-     * @param request Dados do cliente (nome e telefone).
-     * @return A entrada criada.
-     */
     public synchronized QueueEntry join(QueueJoinRequest request) {
         var clientName = validateName(request.clientName());
         var clientPhone = PhoneNormalizer.normalize(request.clientPhone());
@@ -64,32 +62,21 @@ public class QueueService {
         return entry;
     }
 
-    /**
-     * Retorna o estado atual da fila.
-     */
     public synchronized QueueSnapshot snapshot() {
-        return QueueSnapshot.from(new ArrayList<>(queue));
+        return authDao.getBarberConfig()
+            .map(b -> QueueSnapshot.from(new ArrayList<>(queue), b.isOpen(), b.avgServiceMinutes()))
+            .orElseGet(() -> QueueSnapshot.from(new ArrayList<>(queue)));
     }
 
-    /**
-     * Busca o status de um cliente específico pelo telefone.
-     * Inclui a estimativa de tempo baseada na posição.
-     */
     public synchronized QueueStatusResponse statusByPhone(String phone) {
         var normalizedPhone = PhoneNormalizer.normalize(phone);
         var entry = queueEntryDao.findWaitingByPhone(normalizedPhone)
             .orElseThrow(() -> new NotFoundResponse("Nenhum atendimento ativo encontrado para este número."));
         
-        // Atualmente usamos 15 minutos como padrão (Semana 2)
-        // Na Semana 3, isso virá dinamicamente do barbeiro
-        return QueueStatusResponse.from(entry, 15);
+        int avgWait = authDao.getBarberConfig().map(b -> b.avgServiceMinutes()).orElse(15);
+        return QueueStatusResponse.from(entry, avgWait);
     }
 
-    /**
-     * Remove um cliente da fila (desistência).
-     * @param phone Telefone do cliente.
-     * @return A entrada atualizada com status LEFT.
-     */
     public synchronized QueueEntry leave(String phone) {
         var normalizedPhone = PhoneNormalizer.normalize(phone);
         var entry = queueEntryDao.findWaitingByPhone(normalizedPhone)
@@ -104,10 +91,20 @@ public class QueueService {
         return updatedEntry;
     }
 
-    /**
-     * Chama o próximo cliente da fila para atendimento.
-     * @return A entrada atualizada com status DONE.
-     */
+    public synchronized QueueEntry removeById(UUID id) {
+        var entry = queueEntryDao.findById(id)
+            .filter(e -> e.status() == QueueStatus.WAITING)
+            .orElseThrow(() -> new NotFoundResponse("Cliente não encontrado na fila ativa."));
+
+        queue.removeIf(item -> item.id().equals(id));
+        var updatedEntry = entry.withStatus(QueueStatus.LEFT, null);
+        queueEntryDao.update(updatedEntry);
+
+        refreshPositions();
+        notifyQueueChanged();
+        return updatedEntry;
+    }
+
     public synchronized QueueEntry callNext() {
         var entry = queue.pollFirst();
         if (entry == null) {
@@ -122,16 +119,15 @@ public class QueueService {
         return updatedEntry;
     }
 
-    /**
-     * Restaura a fila em memória a partir dos dados persistidos no banco.
-     */
+    public void triggerBroadcast() {
+        notifyQueueChanged();
+    }
+
     private void restoreWaitingQueue() {
         var restored = queueEntryDao.findWaitingEntries();
         queue.clear();
         restored.forEach(queue::addLast);
         
-        // Garante que o ticket number continue de onde parou no dia, 
-        // mesmo que clientes tenham saído ou sido atendidos.
         nextTicketNumber = restored.stream()
             .mapToInt(QueueEntry::ticketNumber)
             .max()
@@ -140,15 +136,9 @@ public class QueueService {
         refreshPositions();
     }
 
-    /**
-     * Recalcula as posições dos clientes na fila.
-     * Utiliza otimização em lote no banco de dados via DAO.
-     */
     private void refreshPositions() {
-        // Atualização em lote no banco de dados para melhor performance (E2)
         queueEntryDao.updatePositions();
         
-        // Sincroniza a memória com o estado atual do banco
         var updatedList = queueEntryDao.findWaitingEntries();
         queue.clear();
         queue.addAll(updatedList);

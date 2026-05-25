@@ -1,18 +1,29 @@
 package com.nextcut.service;
 
+import com.nextcut.dao.AuthDao;
 import com.nextcut.dao.InMemoryQueueEntryDao;
 import com.nextcut.model.QueueJoinRequest;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ConflictResponse;
 import org.junit.jupiter.api.Test;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class QueueServiceTest {
+    private AuthDao mockAuthDao() {
+        var dao = mock(AuthDao.class);
+        when(dao.getBarberConfig()).thenReturn(Optional.empty());
+        return dao;
+    }
+
     @Test
     void joinsClientsUsingFifoOrderAndSequentialTickets() {
-        var service = new QueueService(new InMemoryQueueEntryDao(), snapshot -> {
+        var service = new QueueService(new InMemoryQueueEntryDao(), mockAuthDao(), snapshot -> {
         });
 
         var first = service.join(new QueueJoinRequest("Ana", "(11) 99999-0001"));
@@ -26,7 +37,7 @@ class QueueServiceTest {
 
     @Test
     void rejectsDuplicatedWaitingPhone() {
-        var service = new QueueService(new InMemoryQueueEntryDao(), snapshot -> {
+        var service = new QueueService(new InMemoryQueueEntryDao(), mockAuthDao(), snapshot -> {
         });
 
         service.join(new QueueJoinRequest("Ana", "(11) 99999-0001"));
@@ -39,7 +50,7 @@ class QueueServiceTest {
 
     @Test
     void validatesRequiredFields() {
-        var service = new QueueService(new InMemoryQueueEntryDao(), snapshot -> {
+        var service = new QueueService(new InMemoryQueueEntryDao(), mockAuthDao(), snapshot -> {
         });
 
         assertThrows(BadRequestResponse.class, () -> service.join(new QueueJoinRequest("", "11999990001")));

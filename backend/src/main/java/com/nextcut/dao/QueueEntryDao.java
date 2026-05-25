@@ -17,4 +17,6 @@ public interface QueueEntryDao {
     void updateStatus(java.util.UUID id, com.nextcut.model.QueueStatus status);
 
     void updatePositions();
+
+    Optional<QueueEntry> findById(java.util.UUID id);
 }

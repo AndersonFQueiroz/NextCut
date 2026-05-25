@@ -168,6 +168,7 @@ A aplicação será web, responsiva, com:
 * Campo: Nome
 * Campo: Telefone
 * Botão: Entrar na fila
+* Rodapé: Link sutil/discreto para login do barbeiro ("Área do Profissional")
 
 ---
 

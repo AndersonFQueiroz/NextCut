@@ -37,6 +37,5 @@ public class QueueController {
             ctx.json(ApiResponse.ok(queueService.leave(phone)));
         });
 
-        routes.post("/admin/next", ctx -> ctx.json(ApiResponse.ok(queueService.callNext())));
     }
 }

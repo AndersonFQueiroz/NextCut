@@ -178,6 +178,7 @@ UI moderna, simples, rápida e mobile-first
 - Validação de formulário
 - Máscara de telefone
 - UX simples
+- O link de login do administrador no rodapé da entrada do cliente deve ser "fantasma" (baixo contraste/discreto) para não distrair o cliente final.
 
 ## Componentização:
 - Reutilizar botões

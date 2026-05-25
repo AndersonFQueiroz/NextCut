@@ -2,8 +2,8 @@
 import { Loader2, Phone, Scissors, User } from 'lucide-react'
 // useState guarda estados locais como nome, telefone, loading
 import { useState, useEffect } from 'react'
-// useNavigate permite redirecionar para a página de status após entrar
-import { useNavigate } from 'react-router-dom'
+// useNavigate e Link permitem redirecionar para outras páginas
+import { useNavigate, Link } from 'react-router-dom'
 // Logo utilizado no cabeçalho da página
 import nextCutLogo from '../assets/nextcut-logo.png'
 // api é a instância axios configurada para chamar o backend
@@ -235,6 +235,17 @@ export default function ClientEntryPage() {
             </button>
           </form>
         </section>
+
+        {/* Footer com link discreto para o login do admin (Opção B) */}
+        <footer className="mt-8 text-center">
+          <Link
+            to="/login"
+            className="text-[10px] uppercase tracking-[0.2em] transition-opacity hover:opacity-100"
+            style={{ color: 'oklch(0.65 0.01 20)', opacity: 0.3 }}
+          >
+            Área do Profissional
+          </Link>
+        </footer>
       </section>
     </main>
   )
