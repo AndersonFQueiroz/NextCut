@@ -67,7 +67,9 @@ com.nextcut
 
 ### Cliente
 - GET /
-- POST /queue/join
+- POST /queue/request-otp
+- POST /queue/verify-otp
+- POST /queue/join (legado interno)
 - GET /queue/status/{phone}
 - POST /queue/leave/{phone}
 

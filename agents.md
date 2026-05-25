@@ -614,6 +614,7 @@ Antes de qualquer `git commit`, o agente **deve**:
 ---
 
 # 21. ROADMAP FUTURO (APÓS MVP)
+- Retornar o limite de 1 entrada por dia por telefone (atualmente um telefone pode entrar de novo caso desista ou seja atendido, para facilitar os testes, mas no app final a restrição de "1 vez por dia" no banco deve voltar)
 - Notificações WhatsApp
 - Múltiplos barbeiros
 - Histórico avançado

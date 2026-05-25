@@ -33,7 +33,8 @@ Pré-requisitos:
 ```bash
 cd backend
 mvn test
-mvn exec:java -Dexec.mainClass="com.nextcut.app.App"
+ Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $name, $value = $_.Split('=', 2); [Environment]::SetEnvironmentVariable($name, $value, 'Process')
+  }; mvn exec:java "-Dexec.mainClass=com.nextcut.app.App"
 ```
 
 Por padrão, a API sobe em:
@@ -64,7 +65,7 @@ cd backend && mvn test
 
 **NextCut** é uma plataforma web de fila virtual para barbearias que desejam abandonar métodos manuais e oferecer uma experiência moderna aos clientes.
 
-> 🎯 **Estado atual**: frontend React com telas de cliente, acompanhamento da fila, login e painel administrativo; backend Java com Javalin, JDBC/PostgreSQL, autenticação BCrypt, fila FIFO e WebSocket para atualização em tempo real. Algumas ações administrativas exibidas na UI ainda dependem de endpoints backend futuros, conforme planejamento do projeto.
+> 🎯 **Estado atual**: frontend React com telas de cliente (incluindo verificação de telefone via código OTP de 4 dígitos), acompanhamento da fila, login e painel administrativo; backend Java com Javalin, JDBC/PostgreSQL, autenticação BCrypt, fila FIFO com tratamento para clientes `IN_SERVICE` e `WAITING`, além de WebSocket para atualização em tempo real. Algumas ações administrativas exibidas na UI ainda dependem de endpoints backend futuros, conforme planejamento do projeto.
 
 ## 🎯 Problema Resolvido
 ### Antes:
@@ -206,7 +207,10 @@ sequenceDiagram
     participant WebSocket
 
     Cliente->>Frontend: Preenche nome + telefone
-    Frontend->>Backend: POST /queue/join
+    Frontend->>Backend: POST /queue/request-otp
+    Backend-->>Frontend: Simulação envio de código via Console/Log
+    Cliente->>Frontend: Digita código de 4 dígitos na tela de OTP
+    Frontend->>Backend: POST /queue/verify-otp
     Backend->>DB: Salva entrada
     Backend->>Backend: Atualiza ArrayDeque
     Backend->>WebSocket: Broadcast atualização
@@ -266,7 +270,9 @@ Estado atual do backend:
 
 ```http
 GET /
-POST /queue/join
+POST /queue/request-otp
+POST /queue/verify-otp
+POST /queue/join (Legado interno)
 GET /queue/status/{phone}
 POST /queue/leave/{phone}
 ```
