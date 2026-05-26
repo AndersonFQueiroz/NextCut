@@ -1,20 +1,75 @@
-# Java / Maven
-target/
-*.class
-.m2/
-dependency-reduced-pom.xml
+# ==========================================
+# NextCut Root GitIgnore
+# ==========================================
 
-# Environment
-.env
-.env.*
-!.env.example
+# OS Metadata
+.DS_Store
+Thumbs.db
+*.ico
 
-# IDEs
+# IDEs and Text Editors
 .idea/
+*.iml
+*.iws
 .vscode/
+!.vscode/extensions.json
+.settings/
+.classpath
+.project
+.factorypath
+.metadata/
+.recommenders/
+*~
+*.swp
+*.swo
+
+# AI / Agent Tools
 .agents/
 .cursor/
 .antigravitycli/
+
+# Environment and Secrets (Never commit credentials)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+!.env.example
+
+# Node / Frontend Build & Cache
+node_modules/
+/frontend/node_modules/
+/frontend/dist/
+/frontend/dist-ssr/
+/frontend/coverage/
+.eslintcache
+*.tsbuildinfo
+
+# Java / Maven Build & Output
+**/target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
+.m2/
+dependency-reduced-pom.xml
+release.properties
+
+# Logs
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Planejamento e Notas (Privado - NUNCA COMMITAR)
 planejamento*.*
@@ -27,6 +82,8 @@ erro*.*
 *.jpeg
 *.gif
 
-# OS
-.DS_Store
-Thumbs.db
+# Exceções para imagens e assets do projeto
+!**/assets/**/*.png
+!**/assets/**/*.jpg
+!**/assets/**/*.jpeg
+!**/assets/**/*.gif
