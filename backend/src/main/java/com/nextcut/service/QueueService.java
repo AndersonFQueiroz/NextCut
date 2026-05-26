@@ -18,23 +18,18 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class QueueService {
-    private final QueueEntryDao queueEntryDao;
-    private final Consumer<QueueSnapshot> queueNotifier;
-    private final ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
-    private int nextTicketNumber = 1;
+private final QueueEntryDao queueEntryDao;
+private final Consumer<QueueSnapshot> queueNotifier;
+private final ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
+private int nextTicketNumber = 1;
+private static final System.Logger LOGGER =
+    System.getLogger(QueueService.class.getName());
 
-    public QueueService(QueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
-        this.queueEntryDao = queueEntryDao;
-        this.queueNotifier = queueNotifier;
-        restoreWaitingQueue();
-    }
-
-    public synchronized QueueEntryQueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
-        this.queueEntryDao = queueEntryDao;
-        this.authDao = authDao;
-        this.queueNotifier = queueNotifier;
-        restoreWaitingQueue();
-    }
+public QueueService(QueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
+    this.queueEntryDao = queueEntryDao;
+    this.queueNotifier = queueNotifier;
+    restoreWaitingQueue();
+}
 
     /**
      * Adiciona um novo cliente na fila de espera.
