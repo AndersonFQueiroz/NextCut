@@ -1,12 +1,10 @@
 package com.nextcut.service;
 
-import com.nextcut.dao.AuthDao;
 import com.nextcut.dao.QueueEntryDao;
 import com.nextcut.model.QueueEntry;
 import com.nextcut.model.QueueJoinRequest;
 import com.nextcut.model.QueueSnapshot;
 import com.nextcut.model.QueueStatus;
-import com.nextcut.model.QueueStatusResponse;
 import com.nextcut.util.PhoneNormalizer;
 import io.javalin.http.BadRequestResponse;
 import io.javalin.http.ConflictResponse;
@@ -16,23 +14,22 @@ import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-/**
- * Serviço que gerencia a lógica de negócio da fila de atendimento.
- * Mantém uma cópia em memória para acesso rápido e sincroniza com o banco de dados.
- */
 public class QueueService {
     private final QueueEntryDao queueEntryDao;
-    private final AuthDao authDao;
     private final Consumer<QueueSnapshot> queueNotifier;
     private final ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
     private int nextTicketNumber = 1;
-    private QueueEntry currentInService;
 
-    public QueueService(QueueEntryDao queueEntryDao, AuthDao authDao, Consumer<QueueSnapshot> queueNotifier) {
+    public QueueService(QueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
+        this.queueEntryDao = queueEntryDao;
+        this.queueNotifier = queueNotifier;
+        restoreWaitingQueue();
+    }
+
+    public synchronized QueueEntryQueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
         this.queueEntryDao = queueEntryDao;
         this.authDao = authDao;
         this.queueNotifier = queueNotifier;
