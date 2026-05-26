@@ -23,6 +23,9 @@ public class QueueService {
     private final ArrayDeque<QueueEntry> queue = new ArrayDeque<>();
     private int nextTicketNumber = 1;
 
+     private static final System.Logger LOGGER =
+        System.getLogger(QueueService.class.getName());
+        
     public QueueService(QueueEntryDao queueEntryDao, Consumer<QueueSnapshot> queueNotifier) {
         this.queueEntryDao = queueEntryDao;
         this.queueNotifier = queueNotifier;
@@ -91,13 +94,32 @@ public class QueueService {
     }
 
     private void restoreWaitingQueue() {
-        var restored = queueEntryDao.findWaitingEntries();
-        restored.forEach(queue::addLast);
-        nextTicketNumber = restored.stream()
-            .mapToInt(QueueEntry::ticketNumber)
-            .max()
-            .orElse(0) + 1;
-        refreshPositions();
+      var restored = queueEntryDao.findWaitingEntries();
+    queue.clear();
+    restored.forEach(queue::addLast);
+
+    var inService = queueEntryDao.findInServiceEntry();
+    currentInService = inService.orElse(null);
+
+    nextTicketNumber = restored.stream()
+        .mapToInt(QueueEntry::ticketNumber)
+        .max()
+        .orElse(0) + 1;
+
+    if (currentInService != null && currentInService.ticketNumber() >= nextTicketNumber) {
+        nextTicketNumber = currentInService.ticketNumber() + 1;
+    }
+
+    // ── LOG DE INICIALIZAÇÃO (critério #28) ──────────────────
+    LOGGER.log(System.Logger.Level.INFO,
+        "[NextCut] Fila restaurada: {0} cliente(s) em espera{1}",
+        restored.size(),
+        currentInService != null
+            ? ", 1 em atendimento (senha #" + currentInService.ticketNumber() + ")"
+            : ""
+    );
+
+    refreshPositions();
     }
 
     private void refreshPositions() {
