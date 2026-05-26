@@ -89,6 +89,22 @@ public class QueueService {
     }
 
     /**
+     * Calcula a estimativa de espera para um cliente com base na posição atual.
+     *
+     * @param posicao posição do cliente na fila (1 = próximo a ser atendido)
+     * @param avgServiceMinutes tempo médio de atendimento em minutos
+     * @return tempo estimado de espera em minutos, com 0 para o próximo cliente
+     */
+    public int calcularEstimativa(int posicao, int avgServiceMinutes) {
+        // Garante que a posição usada no cálculo não seja menor que 1.
+        int safePosition = Math.max(posicao, 1);
+        // Calcula quantos clientes ainda irão ser atendidos antes.
+        int waitingCustomers = Math.max(safePosition - 1, 0);
+        // Retorna o total de minutos estimados de espera.
+        return waitingCustomers * avgServiceMinutes;
+    }
+
+    /**
      * Recupera o status de um cliente baseado no seu número de telefone.
      * Verifica tanto a lista de espera no banco (WAITING) quanto a variável
      * em memória (IN_SERVICE) para garantir consistência em tempo real.

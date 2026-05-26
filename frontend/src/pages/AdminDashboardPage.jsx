@@ -1,7 +1,7 @@
 // useCallback memoriza funções usadas pelo polling; useEffect roda efeitos como buscar dados; useState guarda estados da tela.
 import { useCallback, useEffect, useState } from 'react'
-// LogOut, Phone e Scissors são ícones da lucide-react usados nos botões e informações do painel.
-import { LogOut, Phone, Scissors } from 'lucide-react'
+// LogOut, Phone, Scissors e ícones de estado do painel são importados da lucide-react.
+import { CheckCircle, LogOut, Phone, Scissors, XCircle } from 'lucide-react'
 // useNavigate permite sair do painel e voltar para /login pelo React Router.
 import { useNavigate } from 'react-router-dom'
 // Componente de feedback visual que aparece no canto inferior direito
@@ -379,20 +379,19 @@ export default function AdminDashboardPage() {
             type="button"
             onClick={alternarAtendimento}
             // h-12 → altura do botão; rounded-lg → cantos arredondados; border → borda fina
-            className="h-12 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             // Altera o fundo inline conforme isOpen para seguir o padrão visual do projeto
             style={{ background: isOpen ? 'var(--gradient-wine)' : 'oklch(0.3 0.02 20)' }}
           >
-            {/* Indicador colorido à esquerda que segue a especificação (verde quando aberto) */}
-            {/* Texto do botão muda conforme isOpen; ● indica o estado visual */}
-            {isOpen ? '● FECHAR ATENDIMENTO' : '● ABRIR ATENDIMENTO'}
+            {isOpen ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+            {isOpen ? 'FECHAR ATENDIMENTO' : 'ABRIR ATENDIMENTO'}
           </button>
           {/* Botão que chama o próximo cliente da fila com estado de loading */}
           <button
             type="button"
             onClick={chamarProximo}
             // inline-flex → mantém ícone e texto alinhados; h-12 → altura do botão
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             // Mantém o visual principal do botão com o gradiente vinho do projeto
             style={{ background: 'var(--gradient-wine)' }}
             // Desabilita o botão enquanto a ação de chamar está em andamento, ou se houver cliente em atendimento

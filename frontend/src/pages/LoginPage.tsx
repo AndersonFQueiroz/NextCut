@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react' // useState guarda valores que mudam na tela; FormEvent tipa o envio do formulário em TypeScript.
-import { CalendarCheck, Lock, Mail, User } from 'lucide-react' // Ícones visuais usados no card, nos inputs e no botão social da tela de login.
+import { CalendarCheck, Lock, User } from 'lucide-react' // Ícones visuais usados no card, nos inputs e no botão social da tela de login.
 import { useNavigate } from 'react-router-dom' // useNavigate permite trocar de rota pelo JavaScript sem recarregar a página inteira.
 import nextCutLogo from '../assets/logo_login.png' // Importa a imagem da logo para o Vite gerar o caminho correto no navegador.
 
@@ -123,26 +123,14 @@ export function LoginPage() {
             {carregando ? 'ENTRANDO...' : 'Entrar no painel'}
           </button>
 
-          <div className="my-7 flex items-center gap-3">
-            <span className="h-px flex-1 bg-[#242424]" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.4em] text-stone-600">ou</span>
-            <span className="h-px flex-1 bg-[#242424]" />
-          </div>
-
-          <button
-            type="button"
-            className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-full border border-[#333] bg-transparent px-5 py-3 text-sm font-semibold uppercase tracking-widest text-stone-100 transition hover:border-[#8b1a1a] hover:bg-[#1e1e1e]"
-          >
-            <Mail className="h-4 w-4 text-red-600" />
-            Entrar com Google
-          </button>
-
           <p className="mt-6 text-center text-sm text-stone-400">
             Acesso exclusivo para profissionais. Solicite credenciais ao gerente.
           </p>
         </form>
 
         <footer className="mt-7 text-center text-xs text-stone-600">© 2026 NextCut · Painel interno</footer>
+        {/* Link discreto abaixo do rodapé para voltar à fila pública usando useNavigate. */}
+        <button type="button" onClick={() => navigate('/')} className="mt-2 w-full text-center text-xs transition-colors hover:text-[var(--wine-glow)]" style={{ color: 'oklch(0.65 0.01 20)' }}>← Voltar para a fila</button> {/* Texto solicitado para retorno à fila. */}
       </div>
     </main>
   )

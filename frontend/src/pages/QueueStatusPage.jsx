@@ -18,7 +18,7 @@ function getErrorMessage(error) {
   )
 }
 
-function MetricCard({ icon: Icon, label, value }) {
+function MetricCard({ icon: Icon, label, value, highlight = false }) {
   return (
     <div
       className="rounded-xl border p-4"
@@ -31,7 +31,7 @@ function MetricCard({ icon: Icon, label, value }) {
         <Icon className="h-4 w-4 text-[var(--wine-glow)]" />
         <span>{label}</span>
       </div>
-      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
+      <p className="mt-3 text-2xl font-semibold" style={{ color: highlight ? 'var(--wine-glow)' : 'var(--foreground)' }}>{value}</p>
     </div>
   )
 }
@@ -101,13 +101,19 @@ export default function QueueStatusPage() {
     }
   }, [hasSnapshot, queueEntry, isLeaving, navigate])
 
-  const estimatedTime = queueEntry?.position ? `${Math.max(queueEntry.position - 1, 0) * 15} min` : '--'
+  // Usa a estimativa enviada pelo backend/WebSocket quando disponível
+  const estimatedTime = queueEntry?.wait_estimate_minutes != null
+    ? (queueEntry.wait_estimate_minutes === 0 ? 'Próximo!' : `Aprox. ${queueEntry.wait_estimate_minutes} min`)
+    : (queueEntry?.position ? `Aprox. ${Math.max(queueEntry.position - 1, 0) * 15} min` : '--')
 
   return (
     <main
       className="relative min-h-screen overflow-hidden px-4 py-8 text-[var(--foreground)]"
       style={{ background: 'var(--gradient-dark)' }}
     >
+      {/* Luz de fundo vermelha e escurecimento nas bordas para manter a mesma camada visual da página inicial */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(110,8,18,0.45),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)]" />
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
       <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
 
@@ -181,7 +187,7 @@ export default function QueueStatusPage() {
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <MetricCard icon={Ticket} label="Senha" value={queueEntry?.ticketNumber ?? '--'} />
                 <MetricCard icon={LogOut} label="Posicao" value={queueEntry?.position ? `${queueEntry.position}a` : '--'} />
-                <MetricCard icon={Clock} label="Estimativa" value={estimatedTime} />
+                <MetricCard icon={Clock} label="Estimativa" value={estimatedTime} highlight={estimatedTime === 'Próximo!'} />
               </div>
             )
           )}
