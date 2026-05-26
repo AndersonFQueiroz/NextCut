@@ -33,22 +33,35 @@ Pré-requisitos:
 ```bash
 cd backend
 mvn test
- Get-Content .env | Where-Object { $_ -match '^\w+=' } | ForEach-Object { $name, $value = $_.Split('=', 2); [Environment]::SetEnvironmentVariable($name, $value, 'Process')
-  }; mvn exec:java "-Dexec.mainClass=com.nextcut.app.App"
+mvn exec:java "-Dexec.mainClass=com.nextcut.app.App"
 ```
 
-Por padrão, a API sobe em:
+Por padrão, a API sobe em `http://localhost:8080`.
 
-```http
-http://localhost:8080
-```
+> [!IMPORTANT]
+> **Aviso para uso no GitHub Codespaces**:
+> O backend rodando na porta 8080 precisa estar com a visibilidade **Pública** para o frontend conseguir acessá-lo sem ser bloqueado pela tela de autenticação do GitHub.
+> Rode no terminal: `gh codespace ports visibility 8080:public -c $CODESPACE_NAME`
 
-**Frontend** (Vite + React + Tailwind; testes com Vitest em ambiente `jsdom`):
+**Frontend** (Vite + React + Tailwind):
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env
+```
+
+**Configuração de Ambiente (.env)**:
+O frontend precisa saber onde o backend está.
+- **Se estiver no seu PC Local**: Copie o modelo `cp .env.example .env`. Ele usará `localhost:8080`.
+- **Se estiver no Codespace**: Crie o arquivo `.env` com a URL pública do seu Codespace para a porta 8080.
+  Exemplo:
+  ```env
+  VITE_API_URL=https://NOME_DO_CODESPACE-8080.app.github.dev
+  VITE_WS_URL=wss://NOME_DO_CODESPACE-8080.app.github.dev/ws/queue
+  ```
+
+Inicie o servidor:
+```bash
 npm run dev
 ```
 

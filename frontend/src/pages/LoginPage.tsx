@@ -16,7 +16,7 @@ export function LoginPage() {
     setCarregando(true) // Marca que a chamada começou para desabilitar o botão e trocar o texto para "ENTRANDO...".
 
     try { // try captura falhas de rede ou respostas inesperadas sem quebrar a tela.
-      const resposta = await fetch('http://localhost:8080/login', { // fetch faz uma requisição HTTP; await espera a resposta do backend.
+      const resposta = await fetch(`${import.meta.env.VITE_API_URL}/login`, { // fetch faz uma requisição HTTP; await espera a resposta do backend.
         method: 'POST', // POST envia credenciais para o servidor processar o login.
         headers: { 'Content-Type': 'application/json' }, // Content-Type avisa ao backend que o corpo está em JSON.
         body: JSON.stringify({ username, password }), // JSON.stringify transforma os estados username e password em texto JSON para enviar.

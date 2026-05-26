@@ -9,7 +9,7 @@ import Toast from '../components/Toast'
 import logoLogin from '../assets/logo_login.png'
 
 // API_BASE centraliza o endereço do backend para facilitar manutenção.
-const API_BASE = 'http://localhost:8080'
+const API_BASE = import.meta.env.VITE_API_URL
 
 // getToken lê o token salvo no login para enviar no header Authorization.
 function getToken() {

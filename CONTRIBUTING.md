@@ -89,6 +89,12 @@ Tanto na pasta `/frontend` quanto na `/backend`, copie o arquivo `.env.example` 
 cp .env.example .env
 ```
 
+> [!IMPORTANT]
+> **Desenvolvimento no GitHub Codespaces**
+> Se estiver rodando no Codespace:
+> 1. Torne a porta do backend pública rodando: `gh codespace ports visibility 8080:public -c $CODESPACE_NAME`
+> 2. No `.env` do frontend, mude o `localhost` para a URL fornecida pelo Codespace (ex: `https://NOME_DO_CODESPACE-8080.app.github.dev`).
+
 ### Rodando o Backend
 Na pasta `/backend`:
 ```bash
