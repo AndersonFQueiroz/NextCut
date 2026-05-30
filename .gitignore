@@ -87,3 +87,48 @@ erro*.*
 !**/assets/**/*.jpg
 !**/assets/**/*.jpeg
 !**/assets/**/*.gif
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Build do frontend
+frontend/dist/
+frontend/.vite/
+
+# Build do backend
+backend/target/
+
+# Logs
+*.log
+npm-debug.log*
+vite-dev.out.log
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Imagens avulsas na raiz ou em docs/
+/*.png
+/*.jpg
+/*.jpeg
+docs/**/*.png
+docs/**/*.jpg
+docs/**/*.jpeg
+
+# Arquivos temporarios
+*.tmp
+*.bak
+*.swp
