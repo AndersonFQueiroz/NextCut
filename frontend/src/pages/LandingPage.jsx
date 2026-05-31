@@ -41,21 +41,7 @@ function getAverageMinutes(payload) {
   return Number.isFinite(Number(value)) ? Number(value) : null
 }
 
-// getTodayTotal lê total_today quando disponível ou conta entradas com entered_date de hoje.
-function getTodayTotal(payload, entries) {
-  // source normaliza campos que podem vir dentro de data.
-  const source = payload?.data ?? payload
-  // explicitTotal aceita total_today tanto na raiz quanto dentro de data.
-  const explicitTotal = payload?.total_today ?? source?.total_today
-  // Retorna total explícito quando a API envia esse campo.
-  if (Number.isFinite(Number(explicitTotal))) return Number(explicitTotal)
-  // todayIso calcula a data local atual no formato YYYY-MM-DD.
-  const todayIso = new Date().toISOString().slice(0, 10)
-  // counted soma entradas que possuem entered_date exatamente no dia atual.
-  const counted = entries.filter((entry) => String(entry.entered_date ?? '').slice(0, 10) === todayIso).length
-  // Retorna null quando não há campo explícito nem entradas datadas para não inventar métrica.
-  return counted > 0 ? counted : null
-}
+
 
 // formatClock cria o texto de dia e hora usado no painel ao vivo.
 function formatClock(date) {
@@ -79,8 +65,7 @@ export default function LandingPage() {
   const [inServiceEntry, setInServiceEntry] = useState(null)
   // avgServiceMinutes guarda o tempo médio de atendimento do barbeiro quando a API envia.
   const [avgServiceMinutes, setAvgServiceMinutes] = useState(null)
-  // totalToday guarda o total de atendimentos do dia quando disponível.
-  const [totalToday, setTotalToday] = useState(null)
+
   // isLoading controla a exibição dos skeletons da fila atual.
   const [isLoading, setIsLoading] = useState(true)
 
@@ -104,63 +89,51 @@ export default function LandingPage() {
     return () => clearInterval(timer)
   }, [])
 
-  // useEffect busca a fila pública uma vez quando a landing é aberta.
+  // useEffect busca a fila pública e configura polling.
   useEffect(() => {
     // mounted evita atualização de estado depois que o componente desmonta.
     let mounted = true
-    // loadQueue encapsula a chamada assíncrona para manter o efeito simples.
-    async function loadQueue() {
-      // setIsLoading liga o estado visual de carregamento antes do fetch.
-      setIsLoading(true)
+    // loadQueue encapsula a chamada assíncrona.
+    async function loadQueue(showLoading = true) {
+      // setIsLoading liga o estado visual de carregamento apenas se solicitado.
+      if (showLoading) setIsLoading(true)
       // try trata falhas de rede sem derrubar a landing.
       try {
-        // baseUrl usa a variável do Vite quando existir ou caminho relativo em fallback.
         const baseUrl = import.meta.env.VITE_API_URL ?? ''
-        // response chama /queue sem instância axios para evitar Authorization automático.
         const response = await fetch(`${baseUrl}/queue`)
-        // payload converte o JSON da resposta pública.
         const payload = await response.json()
-        // list extrai a lista nos formatos aceitos pela tarefa.
         const list = getQueueList(payload)
-        // inService extrai o cliente em atendimento.
         const inService = getInServiceEntry(payload)
-        // average extrai avgServiceMinutes nos aliases aceitos.
         const average = getAverageMinutes(payload)
-        // today calcula ou lê o total do dia conforme dados disponíveis.
-        const today = getTodayTotal(payload, list)
-        // Só atualiza estados se a landing ainda estiver montada.
+        
         if (mounted) {
-          // Atualiza a lista pública da fila.
           setEntries(list)
-          // Atualiza o cliente em atendimento.
           setInServiceEntry(inService)
-          // Atualiza a média de atendimento do barbeiro.
           setAvgServiceMinutes(average)
-          // Atualiza o total de atendimentos do dia.
-          setTotalToday(today)
         }
       } catch {
-        // Em falha, mantém valores vazios para renderizar o estado seguro.
         if (mounted) {
-          // Limpa entradas para evitar dados inconsistentes.
           setEntries([])
           setInServiceEntry(null)
-          // Remove média quando a API não responde.
           setAvgServiceMinutes(null)
-          // Remove total do dia quando a API não responde.
-          setTotalToday(null)
         }
       } finally {
-        // Desliga o skeleton se o componente ainda existir.
-        if (mounted) setIsLoading(false)
+        if (mounted && showLoading) setIsLoading(false)
       }
     }
-    // Executa a busca pública inicial da fila.
-    loadQueue()
-    // Cleanup marca que o componente saiu da tela.
+    
+    // Executa a busca pública inicial exibindo o loading
+    loadQueue(true)
+    
+    // Polling a cada 10 segundos para manter o dashboard atualizado (sem piscar a tela)
+    const intervalId = setInterval(() => {
+      loadQueue(false)
+    }, 10000)
+
+    // Cleanup marca que o componente saiu da tela e limpa o intervalo.
     return () => {
-      // mounted falso bloqueia setState tardio.
       mounted = false
+      clearInterval(intervalId)
     }
   }, [])
 
@@ -282,7 +255,7 @@ export default function LandingPage() {
           </header>
 
           {/* Métricas públicas da fila. */}
-          <div className="grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-[oklch(0.42_0.14_17_/_0.2)] bg-[oklch(0.42_0.14_17_/_0.2)]">
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-[oklch(0.42_0.14_17_/_0.2)] bg-[oklch(0.42_0.14_17_/_0.2)]">
             {/* Métrica de clientes aguardando. */}
             <div className="p-4" style={{ background: 'oklch(0.13 0.01 20)' }}>
               {/* Valor total em espera. */}
@@ -296,13 +269,6 @@ export default function LandingPage() {
               <p className="text-2xl font-bold text-white">{avgServiceMinutes == null ? '--' : `${avgServiceMinutes}m`}</p>
               {/* Label da espera média. */}
               <p className="mt-1 text-[10px] uppercase tracking-widest text-stone-500">ESPERA MÉDIA</p>
-            </div>
-            {/* Métrica de atendimentos do dia. */}
-            <div className="p-4" style={{ background: 'oklch(0.13 0.01 20)' }}>
-              {/* Valor do total do dia ou placeholder. */}
-              <p className="text-2xl font-bold text-white">{totalToday == null ? '--' : totalToday}</p>
-              {/* Label do total do dia. */}
-              <p className="mt-1 text-[10px] uppercase tracking-widest text-stone-500">TOTAL DE HOJE</p>
             </div>
           </div>
 
