@@ -33,6 +33,7 @@ public class QueueController {
     public void register(RoutesConfig routes) {
         // Nova rota para solicitar o envio do código OTP
         routes.post("/queue/request-otp", ctx -> {
+            queueService.assertShopIsOpen();
             var request = ctx.bodyAsClass(OtpRequest.class);
             otpService.generateAndSend(request.clientPhone());
             ctx.status(200).json(ApiResponse.ok(Map.of("message", "Código enviado com sucesso.")));
@@ -40,6 +41,7 @@ public class QueueController {
 
         // Nova rota para verificar o código OTP e só então entrar na fila
         routes.post("/queue/verify-otp", ctx -> {
+            queueService.assertShopIsOpen();
             var request = ctx.bodyAsClass(OtpVerifyRequest.class);
             otpService.verify(request.clientPhone(), request.otpCode());
             
@@ -49,6 +51,7 @@ public class QueueController {
         });
 
         routes.post("/queue/join", ctx -> {
+            queueService.assertShopIsOpen();
             var request = ctx.bodyAsClass(QueueJoinRequest.class);
             ctx.status(201).json(ApiResponse.ok(queueService.join(request)));
         });

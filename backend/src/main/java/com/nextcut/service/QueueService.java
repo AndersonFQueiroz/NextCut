@@ -37,7 +37,16 @@ public class QueueService {
         restoreWaitingQueue();
     }
 
+    public void assertShopIsOpen() {
+        boolean isOpen = authDao.getBarberConfig().map(b -> b.isOpen()).orElse(true);
+        if (!isOpen) {
+            throw new io.javalin.http.ForbiddenResponse("A barbearia está fechada no momento.");
+        }
+    }
+
     public synchronized QueueEntry join(QueueJoinRequest request) {
+        assertShopIsOpen();
+        
         var clientName = validateName(request.clientName());
         var clientPhone = PhoneNormalizer.normalize(request.clientPhone());
 
