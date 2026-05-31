@@ -284,7 +284,14 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao finalizar com pagamento: " + e.getMessage(), e);
+            // Fallback amigável: se o usuário ainda não rodou o script SQL 003
+            // (colunas paid_amount e tip_amount não existem), apenas finaliza normalmente (modo simulado)
+            if (e.getMessage() != null && e.getMessage().contains("column \"paid_amount\" of relation \"queue_entries\" does not exist")) {
+                System.out.println("[WARN] Colunas de pagamento não encontradas no banco. Finalizando atendimento em modo simulado sem salvar os valores.");
+                updateStatus(entry.id(), entry.status());
+            } else {
+                throw new RuntimeException("Erro ao finalizar com pagamento: " + e.getMessage(), e);
+            }
         }
     }
 

@@ -1,5 +1,5 @@
-import { AlertTriangle, ArrowLeft, Clock, Loader2, LogOut, Phone, Ticket } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { AlertTriangle, ArrowLeft, Clock, Loader2, LogOut, Phone, Ticket, CheckCircle } from 'lucide-react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import nextCutLogo from '../assets/nextcut-logo.png'
 import ClientPaymentCard from '../components/ClientPaymentCard'
@@ -94,12 +94,34 @@ export default function QueueStatusPage() {
     }
   }
 
-  // Se o cliente foi removido pelo admin (ou seja, tem snapshot mas não tem mais entry),
-  // redireciona de volta para a tela inicial
+  // Ref para armazenar o estado anterior e sabermos se o cliente estava na cadeira antes de sumir
+  const previousEntryRef = useRef(null)
+  const [serviceFinished, setServiceFinished] = useState(false)
+
+  useEffect(() => {
+    if (queueEntry) {
+      previousEntryRef.current = queueEntry
+    }
+  }, [queueEntry])
+
+  // Se o cliente foi removido pelo admin (ou finalizado),
+  // mostramos uma mensagem amigável antes de redirecionar
   useEffect(() => {
     if (hasSnapshot && !queueEntry && !isLeaving) {
-      sessionStorage.removeItem('nextcut.clientPhone')
-      navigate('/entrada')
+      const wasInService = previousEntryRef.current?.status === 'IN_SERVICE'
+      
+      if (wasInService) {
+        setServiceFinished(true)
+        // Redireciona após 4 segundos
+        const timer = setTimeout(() => {
+          sessionStorage.removeItem('nextcut.clientPhone')
+          navigate('/entrada')
+        }, 4000)
+        return () => clearTimeout(timer)
+      } else {
+        sessionStorage.removeItem('nextcut.clientPhone')
+        navigate('/entrada')
+      }
     }
   }, [hasSnapshot, queueEntry, isLeaving, navigate])
 
@@ -175,7 +197,18 @@ export default function QueueStatusPage() {
             </div>
           ) : null}
 
-          {isLoading ? (
+          {serviceFinished ? (
+            <div className="mt-8 flex flex-col items-center justify-center rounded-xl p-8 text-center shadow-[var(--shadow-wine)] transition-all sm:p-10" style={{ background: 'var(--gradient-wine)' }}>
+              <CheckCircle className="mb-4 h-16 w-16 text-white animate-bounce" />
+              <h2 className="text-2xl font-bold uppercase tracking-widest text-white sm:text-3xl">Atendimento Finalizado!</h2>
+              <p className="mt-4 text-base text-stone-200">
+                Obrigado por escolher a NextCut!
+              </p>
+              <p className="mt-1 text-sm text-stone-300">
+                Você será redirecionado para o início em instantes...
+              </p>
+            </div>
+          ) : isLoading ? (
             <QueueStatusSkeleton />
           ) : (
             queueEntry?.status === 'IN_SERVICE' ? (

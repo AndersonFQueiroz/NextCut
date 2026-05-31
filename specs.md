@@ -52,6 +52,8 @@ Javalin → HTTP POST → Node.js (WPPConnect) → WhatsApp do Cliente
 - position
 - entered_at
 - called_at
+- paid_amount
+- tip_amount
 
 ---
 
@@ -83,6 +85,9 @@ com.nextcut
 ### Barbeiro
 - POST /login
 - POST /admin/next
+- POST /admin/payment/request
+- POST /admin/finish
+- POST /pix/gerar
 
 ### WebSocket
 - /ws/queue

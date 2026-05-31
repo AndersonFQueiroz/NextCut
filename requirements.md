@@ -233,7 +233,7 @@ Evitar:
 
 * Cadastro completo de usuários
 * Múltiplas barbearias
-* Sistema de pagamento
+* Integração bancária direta (usamos apenas geração offline de QR Code Pix)
 * Aplicativo mobile nativo
 
 ---

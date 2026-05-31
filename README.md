@@ -62,7 +62,7 @@ npm install
 **Configuração de Ambiente (.env)**:
 O frontend precisa saber onde o backend está, e o backend precisa saber onde o WhatsApp está.
 - **Frontend**: Copie `cp .env.example .env`.
-- **Backend**: Copie `cp .env.example .env` e mantenha `EVOLUTION_API_URL=http://localhost:8081`.
+- **Backend**: Copie `cp .env.example .env` e mantenha `EVOLUTION_API_URL=http://localhost:8081`. Preencha os dados do PIX (opcional) se for testar a geração de QR Code.
 
 Inicie o servidor frontend:
 ```bash
@@ -288,6 +288,8 @@ sequenceDiagram
 | position      | INT       |
 | entered_at    | TIMESTAMP |
 | called_at     | TIMESTAMP |
+| paid_amount   | DOUBLE    |
+| tip_amount    | DOUBLE    |
 
 ---
 
@@ -311,6 +313,9 @@ POST /queue/leave/{phone}
 ```http
 POST /login
 POST /admin/next
+POST /admin/payment/request
+POST /admin/finish
+POST /pix/gerar
 ```
 
 Planejados para o painel administrativo:

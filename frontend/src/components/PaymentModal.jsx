@@ -35,39 +35,61 @@ export default function PaymentModal({ isOpen, onClose, onConfirm, onFinishWitho
   const total = numericAmount + tipValue
 
   // Gera o payload Pix e envia a cobrança para a tela do cliente
-  const gerarPix = useCallback(async () => {
-    if (numericAmount <= 0) return
+  const gerarPix = async () => {
+    const parsedAmount = parseFloat(amount) || 0
+    if (parsedAmount <= 0) return
     setLoading(true)
     try {
-      // Envia a cobrança para aparecer na tela do cliente
+      // Tenta enviar a cobrança para a tela do cliente (não bloqueia se falhar)
       if (!paymentRequested) {
-        await fetch(`${API_BASE}/admin/payment/request`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${getToken()}`
-          },
-          body: JSON.stringify({ amount: numericAmount })
-        })
-        setPaymentRequested(true)
+        try {
+          const reqResp = await fetch(`${API_BASE}/admin/payment/request`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({ amount: parsedAmount })
+          })
+          if (reqResp.ok) {
+            setPaymentRequested(true)
+          } else {
+            console.warn('[PaymentModal] Aviso: Endpoint /admin/payment/request falhou com status', reqResp.status)
+          }
+        } catch (err) {
+          console.error('[PaymentModal] Erro ao enviar cobrança ao cliente:', err)
+        }
       }
 
       // Gera o QR Code com o valor total (serviço + gorjeta)
+      const currentTotal = parsedAmount + (clientTipValue ?? 0)
       const resp = await fetch(`${API_BASE}/pix/gerar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: total })
+        body: JSON.stringify({ amount: currentTotal })
       })
+      
       const data = await resp.json()
-      if (data?.success && data?.data?.payload) {
-        setPixPayload(data.data.payload)
+      
+      if (!resp.ok || !data?.success) {
+        alert(`Erro da API ao gerar Pix: ${data?.error || 'Verifique se o backend foi reiniciado.'}`)
+        return
       }
-    } catch {
-      // Silencioso — em modo demo sem backend o QR não aparece
+
+      console.log('[PaymentModal] Resposta /pix/gerar:', data)
+      if (data?.data?.payload) {
+        setPixPayload(data.data.payload)
+      } else {
+        alert('Payload não encontrado na resposta. Veja o console.')
+        console.error('[PaymentModal] Resposta inválida:', data)
+      }
+    } catch (err) {
+      console.error('[PaymentModal] Erro de rede ao gerar Pix:', err)
+      alert('Erro de rede: O servidor backend parece estar desligado.')
     } finally {
       setLoading(false)
     }
-  }, [numericAmount, total, paymentRequested])
+  }
 
   // Regenera o QR Code quando a gorjeta muda
   useEffect(() => {
