@@ -25,6 +25,12 @@ function getQueueList(payload) {
   return []
 }
 
+// getInServiceEntry extrai o cliente em atendimento do payload
+function getInServiceEntry(payload) {
+  const source = payload?.data ?? payload
+  return source?.inServiceEntry ?? payload?.inServiceEntry ?? null
+}
+
 // getAverageMinutes aceita os nomes camelCase e snake_case previstos na tarefa.
 function getAverageMinutes(payload) {
   // source normaliza campos que podem vir dentro de data.
@@ -69,6 +75,8 @@ export default function LandingPage() {
   const [now, setNow] = useState(new Date())
   // entries guarda a lista pública recebida de GET /queue.
   const [entries, setEntries] = useState([])
+  // inServiceEntry guarda o cliente que está em atendimento no momento.
+  const [inServiceEntry, setInServiceEntry] = useState(null)
   // avgServiceMinutes guarda o tempo médio de atendimento do barbeiro quando a API envia.
   const [avgServiceMinutes, setAvgServiceMinutes] = useState(null)
   // totalToday guarda o total de atendimentos do dia quando disponível.
@@ -78,8 +86,13 @@ export default function LandingPage() {
 
   // waitingEntries filtra somente clientes aguardando e preserva a ordem recebida da API.
   const waitingEntries = useMemo(() => entries.filter((entry) => entry.status === 'WAITING'), [entries])
-  // visibleEntries limita a lista visual aos quatro primeiros clientes aguardando.
-  const visibleEntries = useMemo(() => waitingEntries.slice(0, 4), [waitingEntries])
+  // visibleEntries combina o cliente em atendimento com os clientes aguardando e limita aos 4 primeiros.
+  const visibleEntries = useMemo(() => {
+    const list = []
+    if (inServiceEntry) list.push(inServiceEntry)
+    list.push(...waitingEntries)
+    return list.slice(0, 4)
+  }, [inServiceEntry, waitingEntries])
   // clientButtonText alterna o texto do botão conforme telefone salvo na sessão.
   const clientButtonText = sessionStorage.getItem('nextcut.clientPhone') ? 'Acompanhar minha senha' : 'Pegue sua senha'
 
@@ -109,6 +122,8 @@ export default function LandingPage() {
         const payload = await response.json()
         // list extrai a lista nos formatos aceitos pela tarefa.
         const list = getQueueList(payload)
+        // inService extrai o cliente em atendimento.
+        const inService = getInServiceEntry(payload)
         // average extrai avgServiceMinutes nos aliases aceitos.
         const average = getAverageMinutes(payload)
         // today calcula ou lê o total do dia conforme dados disponíveis.
@@ -117,6 +132,8 @@ export default function LandingPage() {
         if (mounted) {
           // Atualiza a lista pública da fila.
           setEntries(list)
+          // Atualiza o cliente em atendimento.
+          setInServiceEntry(inService)
           // Atualiza a média de atendimento do barbeiro.
           setAvgServiceMinutes(average)
           // Atualiza o total de atendimentos do dia.
@@ -127,6 +144,7 @@ export default function LandingPage() {
         if (mounted) {
           // Limpa entradas para evitar dados inconsistentes.
           setEntries([])
+          setInServiceEntry(null)
           // Remove média quando a API não responde.
           setAvgServiceMinutes(null)
           // Remove total do dia quando a API não responde.
@@ -284,7 +302,7 @@ export default function LandingPage() {
               {/* Valor do total do dia ou placeholder. */}
               <p className="text-2xl font-bold text-white">{totalToday == null ? '--' : totalToday}</p>
               {/* Label do total do dia. */}
-              <p className="mt-1 text-[10px] uppercase tracking-widest text-stone-500">HOJE</p>
+              <p className="mt-1 text-[10px] uppercase tracking-widest text-stone-500">TOTAL DE HOJE</p>
             </div>
           </div>
 
@@ -321,7 +339,15 @@ export default function LandingPage() {
                       <span className="truncate text-sm font-medium text-white">{entry.clientName ?? 'Cliente'}</span>
                     </div>
                     {/* Status estimado à direita da linha. */}
-                    <span className={index === 0 ? 'text-[10px] text-red-400' : 'text-[10px] text-stone-500'}>{index === 0 ? 'EM ATENDIMENTO' : avgServiceMinutes == null ? '--' : `~${index * avgServiceMinutes} MIN`}</span>
+                    <span className={entry.status === 'IN_SERVICE' ? 'text-[10px] text-red-400' : 'text-[10px] text-stone-500'}>
+                      {entry.status === 'IN_SERVICE'
+                        ? 'EM ATENDIMENTO'
+                        : avgServiceMinutes == null
+                          ? '--'
+                          : entry.wait_estimate_minutes != null
+                            ? (entry.wait_estimate_minutes === 0 ? 'PRÓXIMO' : `~${entry.wait_estimate_minutes} MIN`)
+                            : `~${Math.max((entry.position ?? 1) - 1, 0) * avgServiceMinutes} MIN`}
+                    </span>
                   </div>
                 ))}
               </div>
