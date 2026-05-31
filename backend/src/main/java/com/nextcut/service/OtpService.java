@@ -1,8 +1,15 @@
 package com.nextcut.service;
 
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.InternalServerErrorResponse;
 import io.javalin.http.TooManyRequestsResponse;
 import com.nextcut.util.PhoneNormalizer;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -29,13 +36,41 @@ public class OtpService {
     // Máximo de tentativas erradas permitidas antes de bloquear o código
     private static final int MAX_ATTEMPTS = 3;
     // Tempo mínimo entre solicitações de novo código (cooldown)
-    private static final int COOLDOWN_SECONDS = 30;
+    private static final int COOLDOWN_SECONDS = 2;
 
     // Memória rápida e thread-safe para armazenar os códigos gerados
     private final Map<String, OtpRecord> otpStore = new ConcurrentHashMap<>();
     
     // SecureRandom é mais seguro que Math.random() para gerar códigos
     private final SecureRandom random = new SecureRandom();
+
+    private final String evolutionApiUrl;
+    private final String evolutionApiKey;
+    private final String evolutionInstance;
+    private final HttpClient httpClient;
+
+    public OtpService() {
+        String apiUrl = getEnvOrProperty("EVOLUTION_API_URL");
+        this.evolutionApiUrl = (apiUrl != null && !apiUrl.isBlank()) ? apiUrl : "http://localhost:8081";
+
+        String apiKey = getEnvOrProperty("EVOLUTION_API_KEY");
+        this.evolutionApiKey = (apiKey != null && !apiKey.isBlank()) ? apiKey : "1234";
+
+        String instance = getEnvOrProperty("EVOLUTION_INSTANCE");
+        this.evolutionInstance = (instance != null && !instance.isBlank()) ? instance : "NextCut";
+
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+    }
+
+    private String getEnvOrProperty(String key) {
+        String val = System.getenv(key);
+        if (val == null || val.isBlank()) {
+            val = System.getProperty(key);
+        }
+        return val;
+    }
 
     /**
      * Registro interno para armazenar o estado do OTP de um cliente.
@@ -70,12 +105,60 @@ public class OtpService {
         var expiresAt = now.plus(OTP_VALIDITY_MINUTES, ChronoUnit.MINUTES);
         otpStore.put(normalizedPhone, new OtpRecord(code, expiresAt, now, 0));
 
-        // TODO: Quando integrar uma API real (Twilio, Z-API, etc), substituir o print abaixo pela chamada da API
+        // SEMPRE imprime o código no terminal como fallback de segurança
         System.out.println("\n=================================================");
-        System.out.println("📱 [MENSAGEM WHATSAPP] Para: " + phone);
-        System.out.println("Seu código de verificação NextCut é: " + code);
-        System.out.println("Válido por " + OTP_VALIDITY_MINUTES + " minutos.");
+        System.out.println("🔐 [CÓDIGO DE ACESSO GERADO]");
+        System.out.println("Cliente: " + phone);
+        System.out.println("CÓDIGO: " + code);
         System.out.println("=================================================\n");
+
+        // Enviar via Evolution API ou imprimir no console se não estiver configurado
+        String messageText = "Seu código de verificação NextCut é: *" + code + "*\n\nVálido por " + OTP_VALIDITY_MINUTES + " minutos.";
+        String recipientPhone = "55" + normalizedPhone; // Assume Brasil
+
+        // WHITELIST DE TESTE: Evita mandar WhatsApp para desconhecidos
+        // Coloque aqui os números que você permite que recebam mensagens reais.
+        java.util.List<String> allowedNumbers = java.util.Arrays.asList("13997754112");
+
+        if (!allowedNumbers.contains(normalizedPhone)) {
+            System.out.println("\n=================================================");
+            System.out.println("📱 [MODO SIMULAÇÃO - MENSAGEM NÃO ENVIADA PARA EVITAR SPAM]");
+            System.out.println("Para: " + phone);
+            System.out.println(messageText);
+            System.out.println("=================================================\n");
+            return; // Sai do método sem chamar o robô
+        }
+
+        if (evolutionApiUrl == null || evolutionApiUrl.isBlank() || evolutionInstance == null || evolutionInstance.isBlank()) {
+            System.out.println("\n=================================================");
+            System.out.println("📱 [MENSAGEM WHATSAPP] Para: " + phone);
+            System.out.println(messageText);
+            System.out.println("=================================================\n");
+            return;
+        }
+
+        try {
+            // Body básico esperado pela Evolution API (Chatwoot/Baileys compatível)
+            String jsonBody = String.format("{\"number\": \"%s\", \"text\": \"%s\"}", recipientPhone, messageText.replace("\n", "\\n"));
+            String endpoint = evolutionApiUrl + "/message/sendText/" + evolutionInstance;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endpoint))
+                    .header("Content-Type", "application/json")
+                    .header("apikey", evolutionApiKey != null ? evolutionApiKey : "")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                System.err.println("Erro ao enviar WhatsApp (" + response.statusCode() + "): " + response.body());
+                // Não joga erro para não travar o frontend
+            }
+        } catch (Exception e) {
+            System.err.println("Exceção ao chamar Node API: " + e.getMessage());
+            // Engole o erro: como a mensagem está chegando no celular do usuário, ignoramos o erro do HTTP Client
+        }
     }
 
     /**

@@ -132,3 +132,7 @@ docs/**/*.jpeg
 *.tmp
 *.bak
 *.swp
+
+# WPPConnect
+whatsapp-service/tokens/
+whatsapp-service/node_modules/

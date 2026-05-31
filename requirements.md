@@ -47,10 +47,11 @@ A aplicação será web, responsiva, com:
 ### 👤 Entrada do Cliente na Fila
 
 * **RF03:** O sistema deve permitir que o cliente informe nome e telefone
-* **RF04:** O sistema deve gerar automaticamente uma senha sequencial
-* **RF05:** O sistema deve inserir o cliente em uma fila única
-* **RF06:** O sistema deve exibir a posição do cliente na fila
-* **RF07:** O sistema deve impedir entradas duplicadas com o mesmo telefone (opcional, mas recomendado)
+* **RF04:** O sistema deve gerar e enviar um código de verificação (OTP) de 4 dígitos via WhatsApp para validar a identidade do cliente
+* **RF05:** O sistema deve gerar automaticamente uma senha sequencial após a validação do código
+* **RF06:** O sistema deve inserir o cliente em uma fila única
+* **RF07:** O sistema deve exibir a posição do cliente na fila
+* **RF08:** O sistema deve impedir entradas duplicadas com o mesmo telefone
 
 ---
 

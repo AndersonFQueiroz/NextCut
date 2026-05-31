@@ -119,7 +119,7 @@ export default function OtpVerificationPage() {
       sessionStorage.setItem('nextcut.clientPhone', clientPhone)
       navigate(`/fila?phone=${encodeURIComponent(clientPhone)}`, { state: { phone: clientPhone } })
     } catch (err) {
-      setError(err.response?.data?.title || err.response?.data?.message || 'Código inválido. Tente novamente.')
+      setError(err.response?.data?.error || err.response?.data?.title || err.response?.data?.message || 'Código inválido. Tente novamente.')
       // Limpa inputs no caso de erro para forçar digitar de novo
       setOtp(['', '', '', ''])
       if (inputRefs[0]?.current) {
@@ -146,7 +146,7 @@ export default function OtpVerificationPage() {
         inputRefs[0].current.focus()
       }
     } catch (err) {
-      setError(err.response?.data?.title || err.response?.data?.message || 'Erro ao reenviar o código.')
+      setError(err.response?.data?.error || err.response?.data?.title || err.response?.data?.message || 'Erro ao reenviar o código.')
     } finally {
       setIsResending(false)
     }

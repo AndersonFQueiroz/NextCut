@@ -177,13 +177,6 @@ export default function LandingPage() {
             {/* Assinatura da marca ao lado do nome principal na navbar. */}
             <span className="ml-3 text-sm font-display tracking-widest text-[var(--wine-glow)]"> | SUA VEZ, SEM ESPERAR.</span>
           </button>
-          {/* Ações rápidas da navbar. */}
-          <div className="flex items-center gap-2">
-            {/* Botão do barbeiro reutiliza a mesma lógica do hero. */}
-            <button type="button" onClick={handleBarberClick} className="hidden h-10 rounded-lg border border-white bg-transparent px-5 text-sm font-semibold uppercase tracking-widest text-white transition hover:text-[var(--wine-glow)] sm:inline-flex sm:items-center">ENTRAR COMO BARBEIRO</button>
-            {/* Botão do cliente reutiliza a mesma lógica do hero. */}
-            <button type="button" onClick={handleClientClick} className="inline-flex h-10 items-center rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)]" style={{ background: 'var(--gradient-wine)' }}>ENTRAR NA FILA</button>
-          </div>
         </div>
         {/* Faixa vermelha listrada abaixo da navbar. */}
         <div className="h-1 bg-[repeating-linear-gradient(135deg,oklch(0.42_0.14_17)_0_10px,oklch(0.28_0.09_17)_10px_20px)]" />
@@ -231,7 +224,7 @@ export default function LandingPage() {
             </button>
           </div>
           {/* Rodapé textual do hero com prova simples. */}
-          <p className="mt-8 text-xs text-stone-600">+100 senhas organizadas sem caderno · Fila digital simples para barbearias.</p>
+          <p className="mt-8 text-xs text-stone-600">Fila digital sem complicação — o cliente acompanha, você atende.</p>
         </section>
 
         {/* Painel ao vivo da coluna direita. */}

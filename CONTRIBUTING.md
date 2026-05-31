@@ -92,7 +92,7 @@ cp .env.example .env
 > [!IMPORTANT]
 > **Desenvolvimento no GitHub Codespaces**
 > Se estiver rodando no Codespace:
-> 1. Torne a porta do backend pública rodando: `gh codespace ports visibility 8080:public -c $CODESPACE_NAME`
+> 1. Torne a porta do backend pública rodando: `gh codespace ports visibility 8080:public -c $CODESPACE_NAME` (A porta 8081 do Robô do WhatsApp **NÃO** precisa ser pública, o Java acessa ela internamente).
 > 2. No `.env` do frontend, mude o `localhost` para a URL fornecida pelo Codespace (ex: `https://NOME_DO_CODESPACE-8080.app.github.dev`).
 
 ### Rodando o Backend
@@ -101,6 +101,15 @@ Na pasta `/backend`:
 mvn clean install
 mvn exec:java "-Dexec.mainClass=com.nextcut.app.App"
 ```
+
+### Rodando o Micro-serviço de WhatsApp (Robô)
+O projeto agora possui um envio real de WhatsApp via biblioteca WPPConnect.
+Na pasta `/whatsapp-service`:
+```bash
+npm install
+npm start
+```
+Após rodar o comando, escaneie o QR Code no seu WhatsApp (ou use o número reservado para testes). O robô responderá na porta `8081`.
 
 ### Rodando o Frontend
 Na pasta `/frontend`:

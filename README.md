@@ -41,7 +41,16 @@ Por padrão, a API sobe em `http://localhost:8080`.
 > [!IMPORTANT]
 > **Aviso para uso no GitHub Codespaces**:
 > O backend rodando na porta 8080 precisa estar com a visibilidade **Pública** para o frontend conseguir acessá-lo sem ser bloqueado pela tela de autenticação do GitHub.
-> Rode no terminal: `gh codespace ports visibility 8080:public -c $CODESPACE_NAME`
+> Rode no terminal: `gh codespace ports visibility 8080:public -c $CODESPACE_NAME` (A porta 8081 do Robô **NÃO** precisa ser pública, o Java acessa ela internamente).
+
+**Micro-serviço WhatsApp (Node.js)**:
+Responsável por enviar os códigos OTP (4 dígitos) via WhatsApp Web de forma invisível.
+```bash
+cd whatsapp-service
+npm install
+npm start
+```
+(Um QR Code aparecerá no terminal para você escanear e conectar)
 
 **Frontend** (Vite + React + Tailwind):
 
@@ -51,16 +60,11 @@ npm install
 ```
 
 **Configuração de Ambiente (.env)**:
-O frontend precisa saber onde o backend está.
-- **Se estiver no seu PC Local**: Copie o modelo `cp .env.example .env`. Ele usará `localhost:8080`.
-- **Se estiver no Codespace**: Crie o arquivo `.env` com a URL pública do seu Codespace para a porta 8080.
-  Exemplo:
-  ```env
-  VITE_API_URL=https://NOME_DO_CODESPACE-8080.app.github.dev
-  VITE_WS_URL=wss://NOME_DO_CODESPACE-8080.app.github.dev/ws/queue
-  ```
+O frontend precisa saber onde o backend está, e o backend precisa saber onde o WhatsApp está.
+- **Frontend**: Copie `cp .env.example .env`.
+- **Backend**: Copie `cp .env.example .env` e mantenha `EVOLUTION_API_URL=http://localhost:8081`.
 
-Inicie o servidor:
+Inicie o servidor frontend:
 ```bash
 npm run dev
 ```
@@ -128,6 +132,7 @@ flowchart LR
     E --> F
     F --> G[DAO Layer]
     G --> H[(Supabase PostgreSQL)]
+    F --> W[Node.js WPPConnect Bot]
 ```
 
 ---
@@ -141,6 +146,7 @@ flowchart TD
     Service --> DAO
     DAO --> Database[(Supabase)]
     Service --> QueueMemory[(ArrayDeque FIFO)]
+    Service --> NodeBot[WhatsApp Bot]
 ```
 
 ---
@@ -171,6 +177,8 @@ nextcut/
 │   │
 │   └── src/test/
 │
+├── whatsapp-service/ (Node.js WPPConnect)
+│
 └── docs/
 ```
 
@@ -189,7 +197,7 @@ nextcut/
 * Context API
 * WebSocket
 
-## 🛠️ Backend
+## 🛠️ Backend (Core)
 
 * Java 17+
 * Javalin
@@ -198,6 +206,11 @@ nextcut/
 * BCrypt
 * JUnit
 * Mockito
+
+## 🤖 Backend (Micro-serviço Mensageria)
+* Node.js 20+
+* Express
+* WPPConnect (WhatsApp Web JS)
 
 ## 🗄️ Banco de Dados
 
@@ -216,12 +229,15 @@ sequenceDiagram
     participant Cliente
     participant Frontend
     participant Backend
+    participant NodeBot
     participant DB
     participant WebSocket
 
     Cliente->>Frontend: Preenche nome + telefone
     Frontend->>Backend: POST /queue/request-otp
-    Backend-->>Frontend: Simulação envio de código via Console/Log
+    Backend->>NodeBot: POST /message/sendText (WPPConnect)
+    NodeBot-->>Cliente: Envia WhatsApp real
+    Backend-->>Frontend: 200 OK (Código salvo)
     Cliente->>Frontend: Digita código de 4 dígitos na tela de OTP
     Frontend->>Backend: POST /queue/verify-otp
     Backend->>DB: Salva entrada
@@ -315,8 +331,9 @@ POST /admin/toggle
 ## Implementado:
 
 * BCrypt password hashing
-* Validação de telefone
+* Validação de telefone (OTP via WhatsApp)
 * Proteção contra duplicidade
+* Proteção de Rate Limiting (Anti-spam OTP)
 * Token de sessão simples para o painel
 * Erros controlados
 
@@ -376,14 +393,14 @@ Veja os arquivos de especificação para detalhes:
 * [x] Estrutura base (frontend + backend)
 * [x] Banco de dados via JDBC/PostgreSQL
 * [x] Login admin
-* [x] Entrada na fila
+* [x] Entrada na fila com validação OTP via WhatsApp
 * [x] Tela de acompanhamento
 * [x] Tempo real (WebSocket)
 * [ ] Completar endpoints administrativos de remover cliente e alternar atendimento
 
 ## 🚀 Fase 2: Melhorias
 
-* [ ] WhatsApp notifications
+* [x] WhatsApp notifications (Micro-serviço WPPConnect)
 * [ ] Multi-barbeiro
 * [ ] Histórico avançado
 * [ ] Dashboard analytics

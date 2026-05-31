@@ -9,6 +9,11 @@
 - BCrypt (hash de senha)
 - Maven
 
+### Backend (Micro-serviço)
+- Node.js 20+
+- Express
+- WPPConnect (WhatsApp Web JS)
+
 ### Banco de Dados
 - Supabase (PostgreSQL)
 - JDBC
@@ -16,13 +21,15 @@
 
 ### Deploy
 - Frontend: Vercel
-- Backend: serviço Java (ex: Railway ou Render)
+- Backend Java: serviço Cloud (ex: Railway ou Render)
+- Backend Node: serviço Cloud (ex: Render ou VPS)
 
 ---
 
 ## 2. Arquitetura
 
 Cliente → HTTP/WebSocket → Javalin → Service → DAO → Supabase (PostgreSQL)
+Javalin → HTTP POST → Node.js (WPPConnect) → WhatsApp do Cliente
 
 ---
 

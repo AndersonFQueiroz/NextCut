@@ -34,6 +34,7 @@ function getErrorMessage(error) {
 
   return (
     error.userMessage ||
+    error.response?.data?.error ||
     error.response?.data?.message ||
     error.response?.data?.title ||
     'Nao foi possivel entrar na fila. Verifique os dados e tente novamente.'
@@ -78,6 +79,12 @@ export default function ClientEntryPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    
+    // Trava de segurança anti-duplo-clique
+    if (isSubmitting) {
+      return
+    }
+
     setApiError('')
 
     if (!validate()) {
