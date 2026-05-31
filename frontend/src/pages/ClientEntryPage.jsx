@@ -133,25 +133,25 @@ export default function ClientEntryPage() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden px-4 py-8 text-[var(--foreground)]"
+      className="relative min-h-screen overflow-x-hidden px-4 py-6 text-[var(--foreground)] sm:py-8"
       style={{ background: 'var(--gradient-dark)' }}
     >
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
       <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
 
-      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-md flex-col justify-center">
-        <header className="mb-7 flex flex-col items-center gap-3 text-center">
+      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-md flex-col justify-center sm:min-h-[calc(100vh-4rem)]">
+        <header className="mb-5 flex flex-col items-center gap-2 text-center sm:mb-7 sm:gap-3">
           <img
             src={nextCutLogo}
             alt="Logo NextCut"
-            className="h-40 w-40 object-contain sm:h-48 sm:w-48"
+            className="h-32 w-32 object-contain sm:h-48 sm:w-48"
             style={{ filter: 'drop-shadow(var(--shadow-wine))' }}
           />
-          <p className="font-sans text-xs uppercase tracking-[0.35em] text-[var(--wine-glow)]">Fila digital</p>
+          <p className="font-sans text-[11px] uppercase tracking-[0.28em] text-[var(--wine-glow)] sm:text-xs sm:tracking-[0.35em]">Fila digital</p>
         </header>
 
         <section
-          className="w-full rounded-2xl border p-6 shadow-2xl backdrop-blur-sm sm:p-8"
+          className="w-full rounded-2xl border p-5 shadow-2xl backdrop-blur-sm sm:p-8"
           style={{
             background: 'oklch(0.16 0.01 20 / 0.7)',
             borderColor: 'oklch(0.42 0.14 17 / 0.3)',
@@ -164,14 +164,14 @@ export default function ClientEntryPage() {
               <p className="text-lg font-semibold" style={{ color: 'oklch(0.86 0.08 25)' }}>Barbearia fechada no momento</p>
             </div>
           ) : null}
-          <div className="flex items-start gap-3">
+          <div className="flex min-w-0 items-start gap-3">
             <span
               className="flex h-10 w-10 flex-none items-center justify-center rounded-lg"
               style={{ background: 'oklch(0.42 0.14 17 / 0.18)' }}
             >
               <Scissors className="h-5 w-5 text-[var(--wine-glow)]" />
             </span>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-xl font-medium text-[var(--foreground)]" style={{ fontFamily: 'var(--font-display)' }}>
                 Entrar na fila
               </h1>
@@ -181,7 +181,7 @@ export default function ClientEntryPage() {
             </div>
           </div>
 
-          <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
+          <form className="mt-7 space-y-5 sm:mt-8" onSubmit={handleSubmit} noValidate>
             <label className="block space-y-2">
               <span className="block text-xs uppercase tracking-widest" style={{ color: 'oklch(0.65 0.01 20)' }}>
                 Nome
@@ -253,10 +253,10 @@ export default function ClientEntryPage() {
         </section>
 
         {/* Footer com link discreto para o login do admin (Opção B) */}
-        <footer className="mt-8 text-center">
+        <footer className="mt-6 text-center sm:mt-8">
           <Link
             to="/login"
-            className="text-[10px] uppercase tracking-[0.2em] transition-opacity hover:opacity-100"
+            className="inline-flex min-h-11 items-center justify-center px-3 text-[10px] uppercase tracking-[0.2em] transition-opacity hover:opacity-100"
             style={{ color: 'oklch(0.65 0.01 20)', opacity: 0.3 }}
           >
             Área do Profissional

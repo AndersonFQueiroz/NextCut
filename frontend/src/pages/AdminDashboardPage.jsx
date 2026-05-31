@@ -335,7 +335,7 @@ export default function AdminDashboardPage() {
 
   // O return abaixo desenha toda a página do painel.
   return (
-   <main className="relative min-h-screen overflow-hidden px-4 py-8 text-white" style={{ background: 'var(--gradient-dark)' }}>
+   <main className="relative min-h-screen overflow-x-hidden px-4 py-6 text-white sm:py-8" style={{ background: 'var(--gradient-dark)' }}>
       {/* Barra decorativa esquerda */}
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
       {/* Barra decorativa direita */}
@@ -348,23 +348,23 @@ export default function AdminDashboardPage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)]" />
 
       {/* Camada z-10 mantém o conteúdo acima das barras e do fundo. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-6 sm:gap-8">
         {/* Header do topo com marca, subtítulo e botão de saída. */}
         <header className="flex flex-col gap-4 border-b border-[oklch(0.42_0.14_17_/_0.3)] pb-6 sm:flex-row sm:items-center sm:justify-between">
           {/* Bloco da marca e nome da tela. */}
-          <div>
+          <div className="min-w-0">
             {/* Título NextCut usa a fonte display Cinzel definida em --font-display. */}
-            <div className="flex items-center gap-3">
-              <img src={logoLogin} alt="NextCut Logo" className="h-10 object-contain" />
-              <h1 className="text-3xl font-bold" style={{ fontFamily: 'var(--font-display)' }}>NextCut</h1>
+            <div className="flex min-w-0 items-center gap-3">
+              <img src={logoLogin} alt="NextCut Logo" className="h-10 flex-none object-contain" />
+              <h1 className="min-w-0 text-2xl font-bold sm:text-3xl" style={{ fontFamily: 'var(--font-display)' }}>NextCut</h1>
             </div>
             {/* Texto auxiliar usa o brilho vinho para destacar o painel do barbeiro. */}
-            <p className="mt-1 text-sm font-semibold uppercase tracking-widest" style={{ color: 'var(--wine-glow)' }}>
+            <p className="mt-1 break-words text-xs font-semibold uppercase tracking-[0.18em] sm:text-sm sm:tracking-widest" style={{ color: 'var(--wine-glow)' }}>
               Painel do Barbeiro {localStorage.getItem('nextcut_adminName') ? `- Olá, ${localStorage.getItem('nextcut_adminName')}` : ''}
             </p>
           </div>
           {/* Botão Sair remove o token e volta para /login. */}
-          <button type="button" onClick={sair} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] bg-transparent px-5 text-sm font-semibold uppercase tracking-widest text-white transition hover:border-[var(--wine-glow)]">
+          <button type="button" onClick={sair} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] bg-transparent px-5 text-sm font-semibold uppercase tracking-widest text-white transition hover:border-[var(--wine-glow)] sm:h-12">
             {/* Ícone LogOut segue o padrão de vinho brilhante com tamanho h-4 w-4. */}
             <LogOut className="h-4 w-4 text-[var(--wine-glow)]" />
             {/* Texto do botão de logout. */}
@@ -379,7 +379,7 @@ export default function AdminDashboardPage() {
             type="button"
             onClick={alternarAtendimento}
             // h-12 → altura do botão; rounded-lg → cantos arredondados; border → borda fina
-            className="h-12 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition"
+            className="min-h-11 rounded-lg border border-[oklch(0.42_0.14_17_/_0.3)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[var(--shadow-wine)] transition sm:h-12 sm:px-5 sm:tracking-widest"
             // Altera o fundo inline conforme isOpen para seguir o padrão visual do projeto
             style={{ background: isOpen ? 'var(--gradient-wine)' : 'oklch(0.3 0.02 20)' }}
           >
@@ -392,7 +392,7 @@ export default function AdminDashboardPage() {
             type="button"
             onClick={chamarProximo}
             // inline-flex → mantém ícone e texto alinhados; h-12 → altura do botão
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg px-5 text-sm font-semibold uppercase tracking-widest text-white shadow-[var(--shadow-wine)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white shadow-[var(--shadow-wine)] transition disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:px-5 sm:tracking-widest"
             // Mantém o visual principal do botão com o gradiente vinho do projeto
             style={{ background: 'var(--gradient-wine)' }}
             // Desabilita o botão enquanto a ação de chamar está em andamento, ou se houver cliente em atendimento
@@ -418,19 +418,19 @@ export default function AdminDashboardPage() {
 
         {/* BLOCO DE EM ATENDIMENTO */}
         {inService && (
-          <section className="rounded-2xl border border-[var(--wine-glow)] p-6 shadow-[var(--shadow-wine)] relative overflow-hidden bg-black/40">
+          <section className="relative overflow-hidden rounded-2xl border border-[var(--wine-glow)] bg-black/40 p-5 shadow-[var(--shadow-wine)] sm:p-6">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(110,8,18,0.3),transparent_70%)]" />
             <div className="relative z-10">
-              <h2 className="text-xl font-bold uppercase tracking-widest text-white mb-4 flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-bold uppercase tracking-widest text-white sm:text-xl">
+                <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                 Em Atendimento
               </h2>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                  <div className="text-2xl font-light text-stone-100" style={{ fontFamily: 'var(--font-display)' }}>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                <div className="min-w-0">
+                  <div className="break-words text-xl font-light text-stone-100 sm:text-2xl" style={{ fontFamily: 'var(--font-display)' }}>
                     {inService.clientName}
                   </div>
-                  <div className="text-sm font-semibold tracking-widest text-[var(--wine-glow)] mt-1">
+                  <div className="mt-1 break-words text-sm font-semibold tracking-widest text-[var(--wine-glow)]">
                     {getClientPhone(inService)}
                   </div>
                 </div>
@@ -438,7 +438,7 @@ export default function AdminDashboardPage() {
                   type="button"
                   onClick={finalizarAtual}
                   disabled={chamando}
-                  className="h-10 rounded-lg px-6 text-sm font-semibold uppercase tracking-widest text-white transition disabled:opacity-50 border border-green-600/50 hover:border-green-500"
+                  className="min-h-11 w-full rounded-lg border border-green-600/50 px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-green-500 disabled:opacity-50 sm:w-auto sm:px-6 sm:tracking-widest"
                   style={{ background: 'linear-gradient(135deg, rgba(22,101,52,0.8), rgba(21,128,61,0.8))' }}
                 >
                   Finalizar Atendimento
@@ -499,28 +499,28 @@ export default function AdminDashboardPage() {
                     {/* Linha interna organiza senha, dados e ação remover. */}
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       {/* Bloco esquerdo com senha e dados do cliente. */}
-                      <div className="flex items-center gap-4">
+                      <div className="flex min-w-0 items-center gap-4">
                         {/* Número da senha em destaque com fonte Cinzel e vinho brilhante. */}
-                        <span className="text-4xl font-bold" style={{ color: 'var(--wine-glow)', fontFamily: 'var(--font-display)' }}>{senha}</span>
+                        <span className="flex-none text-4xl font-bold" style={{ color: 'var(--wine-glow)', fontFamily: 'var(--font-display)' }}>{senha}</span>
                         {/* Bloco textual com nome, telefone e posição. */}
-                        <div>
+                        <div className="min-w-0">
                           {/* Nome do cliente em branco para leitura principal. */}
-                          <h3 className="text-lg font-semibold text-white">{nome}</h3>
+                          <h3 className="break-words text-lg font-semibold text-white">{nome}</h3>
                           {/* Telefone com ícone e cor auxiliar oklch. */}
-                          <p className="mt-1 flex items-center gap-2 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
+                          <p className="mt-1 flex min-w-0 items-center gap-2 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
                             {/* Ícone Phone segue a regra de vinho e tamanho h-4 w-4. */}
-                            <Phone className="h-4 w-4 text-[var(--wine-glow)]" />
+                            <Phone className="h-4 w-4 flex-none text-[var(--wine-glow)]" />
                             {/* Texto do telefone vindo da API. */}
-                            {telefone}
+                            <span className="min-w-0 break-words">{telefone}</span>
                           </p>
                           {/* Tag de posição mostra a ordem do cliente na fila. */}
                           <span className="mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ color: 'oklch(0.65 0.01 20)', borderColor: 'oklch(0.42 0.14 17 / 0.3)' }}>Posição {index + 1}</span>
 
                           {/* Badges especiais para os 3 primeiros: index 0 => PRÓXIMO ; index 1-2 => EM BREVE */}
                           {index === 0 ? (
-                            <span className="mt-2 ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ background: 'var(--gradient-wine)', color: 'white' }}>PRÓXIMO</span>
+                            <span className="ml-2 mt-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ background: 'var(--gradient-wine)', color: 'white' }}>PRÓXIMO</span>
                           ) : index === 1 || index === 2 ? (
-                            <span className="mt-2 ml-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ border: '1px solid oklch(0.42 0.14 17 / 0.5)', color: 'var(--wine-glow)' }}>EM BREVE</span>
+                            <span className="ml-2 mt-2 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest" style={{ border: '1px solid oklch(0.42 0.14 17 / 0.5)', color: 'var(--wine-glow)' }}>EM BREVE</span>
                           ) : null}
                         </div>
                       </div>
@@ -530,7 +530,7 @@ export default function AdminDashboardPage() {
                         onClick={() => removerCliente(id)}
                         // Apenas o botão da linha removida fica desabilitado enquanto a requisição está em andamento
                         disabled={removingId === id}
-                        className="h-10 rounded-lg border border-red-400/40 bg-transparent px-4 text-xs font-semibold uppercase tracking-widest text-red-400 transition hover:border-red-400 hover:text-white disabled:opacity-50 disabled:pointer-events-none"
+                        className="min-h-11 w-full rounded-lg border border-red-400/40 bg-transparent px-4 py-3 text-xs font-semibold uppercase tracking-widest text-red-400 transition hover:border-red-400 hover:text-white disabled:pointer-events-none disabled:opacity-50 sm:w-auto"
                       >
                         {/* Texto muda para indicar remoção quando a ação estiver em progresso */}
                         {removingId === id ? 'Removendo...' : 'Remover'}
