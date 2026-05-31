@@ -267,7 +267,7 @@ export default function ClientEntryPage() {
         </footer>
         {/* Botão discreto para voltar à nova landing inicial. */}
         <button type="button" onClick={() => navigate('/')} className="mt-2 text-xs transition-colors hover:text-[var(--wine-glow)]" style={{ color: 'oklch(0.65 0.01 20)' }}>← Voltar ao início</button>
-      </div>
+      </section>
     </main>
   )
 }
