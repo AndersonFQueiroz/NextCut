@@ -160,6 +160,9 @@ export default function OtpVerificationPage() {
       className="relative min-h-screen overflow-hidden px-4 py-8 text-[var(--foreground)]"
       style={{ background: 'var(--gradient-dark)' }}
     >
+      {/* Luz de fundo vermelha e escurecimento nas bordas para manter o visual do projeto */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(110,8,18,0.45),transparent_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)]" />
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
       <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
 
@@ -207,7 +210,7 @@ export default function OtpVerificationPage() {
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
                 disabled={isVerifying}
-                className="h-14 w-12 rounded-xl border bg-transparent text-center text-2xl font-bold text-white transition-colors focus:border-[var(--wine-glow)] focus:outline-none focus:ring-1 focus:ring-[var(--wine-glow)] sm:h-16 sm:w-14"
+                className="h-14 w-12 rounded-xl border bg-transparent text-center text-2xl font-bold text-white transition-colors focus:border-[oklch(0.55_0.18_18)] focus:outline-none focus:ring-1 focus:ring-[oklch(0.55_0.18_18)] sm:h-16 sm:w-14"
                 style={{ 
                   borderColor: error ? 'oklch(0.58 0.2 25)' : (digit ? 'var(--wine-glow)' : 'oklch(0.3 0.02 20)'),
                   background: 'oklch(0.12 0.01 20 / 0.5)'
@@ -238,7 +241,7 @@ export default function OtpVerificationPage() {
               type="button"
               onClick={resendOtp}
               disabled={cooldown > 0 || isResending}
-              className="text-sm font-semibold transition-colors disabled:opacity-50"
+              className="text-sm font-semibold transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
               style={{ color: cooldown > 0 ? 'oklch(0.65 0.01 20)' : 'var(--wine-glow)' }}
             >
               {isResending ? 'Reenviando...' : cooldown > 0 ? `Reenviar código em ${cooldown}s` : 'Não recebi o código'}
@@ -249,7 +252,7 @@ export default function OtpVerificationPage() {
         <button
           type="button"
           onClick={() => navigate('/entrada')}
-          className="mx-auto mt-6 flex items-center gap-2 text-sm font-semibold transition-colors hover:text-white"
+          className="mx-auto mt-6 flex items-center gap-2 text-sm font-semibold transition-transform hover:scale-[1.02] active:scale-[0.98]"
           style={{ color: 'oklch(0.65 0.01 20)' }}
         >
           <ArrowLeft className="h-4 w-4" />

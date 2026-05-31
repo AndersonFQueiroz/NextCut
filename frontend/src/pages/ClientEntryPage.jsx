@@ -134,8 +134,11 @@ export default function ClientEntryPage() {
   return (
     <main
       className="relative min-h-screen overflow-x-hidden px-4 py-6 text-[var(--foreground)] sm:py-8"
-      style={{ background: 'var(--gradient-dark)' }}
+      style={{ background: '#0a0a0a' }}
     >
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at top left, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at bottom right, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at bottom left, rgba(80,5,15,0.5) 0%, transparent 40%)' }} />
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
       <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
 
@@ -153,9 +156,9 @@ export default function ClientEntryPage() {
         <section
           className="w-full rounded-2xl border p-5 shadow-2xl backdrop-blur-sm sm:p-8"
           style={{
-            background: 'oklch(0.16 0.01 20 / 0.7)',
-            borderColor: 'oklch(0.42 0.14 17 / 0.3)',
-            boxShadow: 'var(--shadow-wine)',
+            background: '#111111',
+            borderColor: '#8f1728',
+            boxShadow: '0 0 22px rgba(143,23,40,0.42), 0 0 72px rgba(120,18,34,0.38)',
           }}
         >
           {/* Quando a barbearia estiver fechada, mostramos um card centralizado avisando o usuário */}
@@ -262,7 +265,9 @@ export default function ClientEntryPage() {
             Área do Profissional
           </Link>
         </footer>
-      </section>
+        {/* Botão discreto para voltar à nova landing inicial. */}
+        <button type="button" onClick={() => navigate('/')} className="mt-2 text-xs transition-colors hover:text-[var(--wine-glow)]" style={{ color: 'oklch(0.65 0.01 20)' }}>← Voltar ao início</button>
+      </div>
     </main>
   )
 }
