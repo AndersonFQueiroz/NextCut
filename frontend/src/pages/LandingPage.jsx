@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom'
 // nextCutLogo usa a logo disponível nos assets do projeto para evitar caminho quebrado.
 import nextCutLogo from '../assets/nextcut-logo.png'
 
-// getQueueList aceita formatos diferentes da API pública de fila sem quebrar a tela.
 function getQueueList(payload) {
   // source normaliza ApiResponse, resposta direta e objetos com entries.
   const source = payload?.data ?? payload
@@ -15,6 +14,9 @@ function getQueueList(payload) {
   if (Array.isArray(payload?.data)) return payload.data
   // Retorna a resposta direta quando o backend devolver um array na raiz.
   if (Array.isArray(payload)) return payload
+  // Retorna queue quando existir (formato atual do QueueSnapshot).
+  if (Array.isArray(source?.queue)) return source.queue
+  if (Array.isArray(payload?.queue)) return payload.queue
   // Retorna entries dentro de data quando existir esse envelope.
   if (Array.isArray(source?.entries)) return source.entries
   // Retorna entries na raiz quando a API usar esse formato.
