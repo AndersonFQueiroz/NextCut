@@ -16,6 +16,8 @@ public interface QueueEntryDao {
 
     void update(QueueEntry entry);
 
+    void updateWithPayment(QueueEntry entry, Double amount, Double tip);
+
     void updateStatus(java.util.UUID id, com.nextcut.model.QueueStatus status);
 
     void updatePositions();

@@ -6,6 +6,8 @@ import { CheckCircle, LogOut, Phone, Scissors, XCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 // Componente de feedback visual que aparece no canto inferior direito
 import Toast from '../components/Toast'
+// Modal de pagamento Pix com QR Code e gorjeta
+import PaymentModal from '../components/PaymentModal'
 import logoLogin from '../assets/logo_login.png'
 
 // API_BASE centraliza o endereço do backend para facilitar manutenção.
@@ -116,6 +118,10 @@ export default function AdminDashboardPage() {
   const [toastMensagem, setToastMensagem] = useState('')
   // toastTipo define se o toast é 'sucesso' ou 'erro'
   const [toastTipo, setToastTipo] = useState('sucesso')
+  // Controla a visibilidade do modal de pagamento Pix
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
+  // Valor da gorjeta do cliente, atualizado via polling em tempo real
+  const [clientTipValue, setClientTipValue] = useState(null)
 
   // carregarFila busca a fila atual e é reutilizada pelo polling e pelos botões.
   const carregarFila = useCallback(async (mostrarCarregando = false) => {
@@ -158,6 +164,9 @@ export default function AdminDashboardPage() {
       setInService(data?.data?.inServiceEntry || data?.inServiceEntry || null)
       // Atualiza o estado isOpen com o valor normalizado.
       setIsOpen(normalizeIsOpen(data))
+      // Atualiza gorjeta do cliente em tempo real (vem do snapshot)
+      const payload = data?.data ?? data
+      setClientTipValue(payload?.clientTipValue ?? null)
       // Limpa erro anterior quando a chamada dá certo.
       setErro('')
     } catch {
@@ -231,19 +240,51 @@ export default function AdminDashboardPage() {
     }
   }
 
-  // finalizarAtual chama o endpoint /admin/finish para concluir o atendimento de quem está na cadeira
-  async function finalizarAtual() {
+  // Abre o modal de pagamento em vez de finalizar diretamente
+  function abrirModalPagamento() {
+    setPaymentModalOpen(true)
+  }
+
+  // Finaliza com valores de pagamento (Pix confirmado)
+  async function finalizarComPagamento(amount, tip) {
     setChamando(true)
     setErro('')
     try {
       const token = getToken()
       const resposta = await fetch(`${API_BASE}/admin/finish`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount, tip }),
       })
-      if (!resposta.ok) {
-        throw new Error('Erro ao finalizar atendimento.')
-      }
+      if (!resposta.ok) throw new Error('Erro ao finalizar atendimento.')
+      setPaymentModalOpen(false)
+      await carregarFila(false)
+      setToastMensagem('Pagamento confirmado!')
+      setToastTipo('sucesso')
+      setToastVisivel(true)
+    } catch {
+      setErro('Não foi possível finalizar o atendimento.')
+      setToastMensagem('Erro ao finalizar')
+      setToastTipo('erro')
+      setToastVisivel(true)
+    } finally {
+      setChamando(false)
+    }
+  }
+
+  // Finaliza sem Pix (dinheiro/cartão)
+  async function finalizarSemPix() {
+    setChamando(true)
+    setErro('')
+    try {
+      const token = getToken()
+      const resposta = await fetch(`${API_BASE}/admin/finish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount: null, tip: null }),
+      })
+      if (!resposta.ok) throw new Error('Erro ao finalizar atendimento.')
+      setPaymentModalOpen(false)
       await carregarFila(false)
       setToastMensagem('Atendimento finalizado')
       setToastTipo('sucesso')
@@ -435,7 +476,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={finalizarAtual}
+                  onClick={abrirModalPagamento}
                   disabled={chamando}
                   className="min-h-11 w-full rounded-lg border border-green-600/50 px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-green-500 disabled:opacity-50 sm:w-auto sm:px-6 sm:tracking-widest"
                   style={{ background: 'linear-gradient(135deg, rgba(22,101,52,0.8), rgba(21,128,61,0.8))' }}
@@ -446,6 +487,16 @@ export default function AdminDashboardPage() {
             </div>
           </section>
         )}
+
+        {/* Modal de pagamento Pix */}
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={() => setPaymentModalOpen(false)}
+          onConfirm={finalizarComPagamento}
+          onFinishWithoutPix={finalizarSemPix}
+          clientTipValue={clientTipValue}
+          clientName={inService?.clientName || 'Cliente'}
+        />
 
         {/* Toast de feedback global, mostra sucesso/erro nas ações administrativas */}
         <Toast

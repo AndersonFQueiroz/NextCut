@@ -11,20 +11,22 @@ public record QueueSnapshot(
     QueueEntry inServiceEntry,
     int size,
     boolean isOpen,
-    int avgServiceMinutes
+    int avgServiceMinutes,
+    Double requestedPaymentValue,
+    Double clientTipValue
 ) {
     /**
      * Cria um snapshot com valores padrão de operação (aberto, 15 min).
      * Usado quando as informações do barbeiro não estão disponíveis.
      */
-    public static QueueSnapshot from(List<QueueEntry> entries, QueueEntry inService) {
-        return new QueueSnapshot(entries, inService, entries.size(), true, 15);
+    public static QueueSnapshot from(List<QueueEntry> entries, QueueEntry inService, Double requestedPaymentValue, Double clientTipValue) {
+        return new QueueSnapshot(entries, inService, entries.size(), true, 15, requestedPaymentValue, clientTipValue);
     }
 
     /**
      * Cria um snapshot completo com dados do barbeiro.
      */
-    public static QueueSnapshot from(List<QueueEntry> entries, QueueEntry inService, boolean isOpen, int avgServiceMinutes) {
-        return new QueueSnapshot(entries, inService, entries.size(), isOpen, avgServiceMinutes);
+    public static QueueSnapshot from(List<QueueEntry> entries, QueueEntry inService, boolean isOpen, int avgServiceMinutes, Double requestedPaymentValue, Double clientTipValue) {
+        return new QueueSnapshot(entries, inService, entries.size(), isOpen, avgServiceMinutes, requestedPaymentValue, clientTipValue);
     }
 }

@@ -247,6 +247,47 @@ public class JdbcQueueEntryDao implements QueueEntryDao {
     }
 
     // ── Mapeamento ResultSet → QueueEntry ─────────────────────
+
+    /**
+     * Atualiza a entrada e salva os valores de pagamento ao finalizar o atendimento.
+     * Usa as colunas paid_amount e tip_amount (precisam existir no banco).
+     */
+    @Override
+    public void updateWithPayment(QueueEntry entry, Double amount, Double tip) {
+        var sql = """
+                UPDATE queue_entries
+                SET status     = CAST(? AS queue_status),
+                    position   = ?,
+                    called_at  = ?,
+                    paid_amount = ?,
+                    tip_amount  = ?
+                WHERE id = ?
+                """;
+        try (var conn = DatabaseConfig.getConnection();
+             var stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, entry.status().name());
+            stmt.setInt(2, entry.position());
+            stmt.setTimestamp(3,
+                    entry.calledAt() != null ? Timestamp.from(entry.calledAt()) : null);
+            if (amount != null) {
+                stmt.setDouble(4, amount);
+            } else {
+                stmt.setNull(4, java.sql.Types.DOUBLE);
+            }
+            if (tip != null) {
+                stmt.setDouble(5, tip);
+            } else {
+                stmt.setNull(5, java.sql.Types.DOUBLE);
+            }
+            stmt.setObject(6, entry.id());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao finalizar com pagamento: " + e.getMessage(), e);
+        }
+    }
+
     private QueueEntry mapRow(ResultSet rs) throws SQLException {
         var calledAtTs = rs.getTimestamp("called_at");
         return new QueueEntry(

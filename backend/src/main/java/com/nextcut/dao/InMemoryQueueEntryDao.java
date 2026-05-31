@@ -71,4 +71,10 @@ public class InMemoryQueueEntryDao implements QueueEntryDao {
             .filter(e -> e.id().equals(id))
             .findFirst();
     }
+
+    @Override
+    public synchronized void updateWithPayment(QueueEntry entry, Double amount, Double tip) {
+        // Em memória não persiste valores financeiros; apenas atualiza o status.
+        update(entry);
+    }
 }

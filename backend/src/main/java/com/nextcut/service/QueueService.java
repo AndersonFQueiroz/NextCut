@@ -76,10 +76,36 @@ public class QueueService {
         return entry;
     }
 
+    private Double currentPaymentValue = null;
+    private Double currentTipValue = null;
+
     public synchronized QueueSnapshot snapshot() {
         return authDao.getBarberConfig()
-            .map(b -> QueueSnapshot.from(new ArrayList<>(queue), currentInService, b.isOpen(), b.avgServiceMinutes()))
-            .orElseGet(() -> QueueSnapshot.from(new ArrayList<>(queue), currentInService));
+            .map(b -> QueueSnapshot.from(new ArrayList<>(queue), currentInService, b.isOpen(), b.avgServiceMinutes(), currentPaymentValue, currentTipValue))
+            .orElseGet(() -> QueueSnapshot.from(new ArrayList<>(queue), currentInService, currentPaymentValue, currentTipValue));
+    }
+
+    /**
+     * Inicia a cobrança no frontend do cliente em tempo real.
+     */
+    public synchronized void requestPayment(double amount) {
+        if (currentInService == null) {
+            throw new BadRequestResponse("Não há cliente em atendimento para cobrar.");
+        }
+        this.currentPaymentValue = amount;
+        this.currentTipValue = 0.0;
+        notifyQueueChanged();
+    }
+
+    /**
+     * O cliente escolhe a gorjeta no app dele, refletindo na tela do admin.
+     */
+    public synchronized void setTip(double tipAmount) {
+        if (currentInService == null || currentPaymentValue == null) {
+            throw new BadRequestResponse("Nenhuma cobrança ativa no momento.");
+        }
+        this.currentTipValue = tipAmount;
+        notifyQueueChanged();
     }
 
     /**
@@ -155,20 +181,25 @@ public class QueueService {
         queueEntryDao.update(updatedEntry);
 
         currentInService = updatedEntry;
+        currentPaymentValue = null;
+        currentTipValue = null;
         refreshPositions();
         notifyQueueChanged();
         return updatedEntry;
     }
 
-    public synchronized QueueEntry finishCurrent() {
+    public synchronized QueueEntry finishCurrent(Double amount, Double tip) {
         if (currentInService == null) {
             throw new NotFoundResponse("Não há cliente em atendimento no momento.");
         }
 
         var updatedEntry = currentInService.withStatus(QueueStatus.DONE, currentInService.calledAt());
-        queueEntryDao.update(updatedEntry);
+        // Salva com pagamentos
+        queueEntryDao.updateWithPayment(updatedEntry, amount, tip);
 
         currentInService = null;
+        currentPaymentValue = null;
+        currentTipValue = null;
         notifyQueueChanged();
         return updatedEntry;
     }

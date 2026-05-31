@@ -43,6 +43,8 @@ export default function useQueueSocket(phone) {
   const [queueEntry, setQueueEntry] = useState(null)
   const [status, setStatus] = useState(phone ? 'connecting' : 'idle')
   const [hasSnapshot, setHasSnapshot] = useState(false)
+  const [requestedPaymentValue, setRequestedPaymentValue] = useState(null)
+  const [clientTipValue, setClientTipValue] = useState(null)
   const reconnectTimerRef = useRef(null)
   const socketRef = useRef(null)
   const normalizedPhone = useMemo(() => normalizePhone(phone), [phone])
@@ -85,6 +87,10 @@ export default function useQueueSocket(phone) {
         try {
           const snapshot = JSON.parse(event.data)
           setQueueEntry(findEntryByPhone(snapshot, normalizedPhone))
+          // Extrai valores de pagamento do snapshot para exibir na tela do cliente
+          const payloadData = snapshot?.payload || snapshot
+          setRequestedPaymentValue(payloadData?.requestedPaymentValue ?? null)
+          setClientTipValue(payloadData?.clientTipValue ?? null)
           setHasSnapshot(true)
           setStatus('connected')
         } catch {
@@ -125,6 +131,8 @@ export default function useQueueSocket(phone) {
     hasSnapshot,
     isConnected: status === 'connected',
     isReconnecting: status === 'reconnecting',
+    requestedPaymentValue,
+    clientTipValue,
     status,
   }
 }

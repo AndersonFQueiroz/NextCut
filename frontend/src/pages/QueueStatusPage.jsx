@@ -2,6 +2,7 @@ import { AlertTriangle, ArrowLeft, Clock, Loader2, LogOut, Phone, Ticket } from 
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import nextCutLogo from '../assets/nextcut-logo.png'
+import ClientPaymentCard from '../components/ClientPaymentCard'
 import useQueueSocket from '../hooks/useQueueSocket'
 import api from '../services/api'
 
@@ -67,7 +68,8 @@ export default function QueueStatusPage() {
   const [isLeaving, setIsLeaving] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
-  const { queueEntry, hasSnapshot, isReconnecting } = useQueueSocket(phone)
+  const [selectedTip, setSelectedTip] = useState(0)
+  const { queueEntry, hasSnapshot, isReconnecting, requestedPaymentValue } = useQueueSocket(phone)
   const isLoading = Boolean(phone) && !hasSnapshot
   const pageError = !phone ? 'Informe seu telefone para acompanhar a fila.' : error
 
@@ -177,12 +179,25 @@ export default function QueueStatusPage() {
             <QueueStatusSkeleton />
           ) : (
             queueEntry?.status === 'IN_SERVICE' ? (
-              <div className="mt-8 rounded-xl p-5 text-center shadow-[var(--shadow-wine)] transition-all sm:p-6" style={{ background: 'var(--gradient-wine)' }}>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-white sm:text-2xl">Chegou sua vez!</h2>
-                <p className="mt-2 text-sm text-stone-200">
-                  O barbeiro já está te aguardando na cadeira.
-                </p>
-              </div>
+              <>
+                <div className="mt-8 rounded-xl p-5 text-center shadow-[var(--shadow-wine)] transition-all sm:p-6" style={{ background: 'var(--gradient-wine)' }}>
+                  <h2 className="text-xl font-bold uppercase tracking-widest text-white sm:text-2xl">Chegou sua vez!</h2>
+                  <p className="mt-2 text-sm text-stone-200">
+                    O barbeiro já está te aguardando na cadeira.
+                  </p>
+                </div>
+                {/* Card de pagamento Pix com gorjeta (aparece quando o barbeiro solicita) */}
+                {requestedPaymentValue != null && requestedPaymentValue > 0 && (
+                  <div className="mt-4">
+                    <ClientPaymentCard
+                      paymentValue={requestedPaymentValue}
+                      onSelectTip={setSelectedTip}
+                      selectedTip={selectedTip}
+                      visible={true}
+                    />
+                  </div>
+                )}
+              </>
             ) : (
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <MetricCard icon={Ticket} label="Senha" value={queueEntry?.ticketNumber ?? '--'} />
