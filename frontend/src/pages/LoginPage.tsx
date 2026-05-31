@@ -40,12 +40,11 @@ export function LoginPage() {
   } // Fecha a função handleSubmit.
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#080808] px-4 py-10 text-stone-100">
-      {/* Luz vermelha centralizada que emana de trás do card */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(110,8,18,0.55),transparent_75%)]" />
-
-      {/* Escurecimento nas bordas para dar profundidade */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)]" />
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10 text-stone-100" style={{ background: '#0a0a0a' }}> {/* Usa o preto base solicitado para receber as vinhetas radiais. */}
+      {/* Vinheta vermelha nas bordas — luz emana dos cantos para o centro */}
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at top left, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom right, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom left, rgba(80,5,15,0.5) 0%, transparent 40%)' }} />
 
       <div className="relative z-10 w-full max-w-[460px]">
         <header className="mb-8 flex flex-col items-center text-center">
@@ -130,7 +129,7 @@ export function LoginPage() {
 
         <footer className="mt-7 text-center text-xs text-stone-600">© 2026 NextCut · Painel interno</footer>
         {/* Link discreto abaixo do rodapé para voltar à fila pública usando useNavigate. */}
-        <button type="button" onClick={() => navigate('/')} className="mt-2 w-full text-center text-xs transition-colors hover:text-[var(--wine-glow)]" style={{ color: 'oklch(0.65 0.01 20)' }}>← Voltar para a fila</button> {/* Texto solicitado para retorno à fila. */}
+        <button type="button" onClick={() => navigate('/')} className="mt-2 w-full text-center text-xs transition-colors hover:text-[var(--wine-glow)]" style={{ color: 'oklch(0.65 0.01 20)' }}>← Voltar ao início</button> {/* Texto ajustado para retorno à nova landing inicial. */}
       </div>
     </main>
   )

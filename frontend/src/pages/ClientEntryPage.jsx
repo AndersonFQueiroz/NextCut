@@ -132,12 +132,13 @@ export default function ClientEntryPage() {
   }, [])
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10 text-stone-100" style={{ background: 'var(--gradient-dark)' }}>
-      {/* Luz vermelha centralizada que emana de trás do card */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(110,8,18,0.55),transparent_75%)]" />
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10 text-stone-100" style={{ background: '#0a0a0a' }}> {/* Alterado: fundo exato do main */}
+      {/* Luz vermelha centralizada — valor aumentado para ficar visível */}
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at top left, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
 
       {/* Escurecimento nas bordas para dar profundidade */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.75)_100%)]" />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom right, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom left, rgba(80,5,15,0.5) 0%, transparent 40%)' }} />
 
       <div className="relative z-10 flex w-full max-w-[460px] flex-col items-center">
         <header className="mb-7 flex flex-col items-center gap-3 text-center">
@@ -150,7 +151,12 @@ export default function ClientEntryPage() {
           <p className="font-sans text-xs uppercase tracking-[0.35em] text-[var(--wine-glow)]">Fila digital</p>
         </header>
 
-        <section className="w-full rounded-xl border p-8 shadow-2xl shadow-black/70 sm:p-10" style={{ background: 'oklch(0.16 0.01 20 / 0.7)', borderColor: 'oklch(0.42 0.14 17 / 0.3)' }}>
+       {/* Card com fundo sólido escuro igual ao LoginPage do barbeiro para contrastar com o brilho vermelho */}
+<section className="w-full rounded-xl border p-8 sm:p-10" style={{
+  background: '#111111',
+  borderColor: '#8f1728',
+  boxShadow: '0 0 22px rgba(143,23,40,0.42), 0 0 72px rgba(120,18,34,0.38)'
+}}>
           {/* Quando a barbearia estiver fechada, mostramos um card centralizado avisando o usuário */}
           {!isOpen ? (
             <div className="mb-6 rounded-2xl border p-6 text-center backdrop-blur-sm" style={{ background: 'oklch(0.16 0.01 20 / 0.7)', borderColor: 'oklch(0.42 0.14 17 / 0.3)' }}>
@@ -255,6 +261,8 @@ export default function ClientEntryPage() {
             Área do Profissional
           </Link>
         </footer>
+        {/* Botão discreto para voltar à nova landing inicial. */}
+        <button type="button" onClick={() => navigate('/')} className="mt-2 text-xs transition-colors hover:text-[var(--wine-glow)]" style={{ color: 'oklch(0.65 0.01 20)' }}>← Voltar ao início</button>
       </div>
     </main>
   )

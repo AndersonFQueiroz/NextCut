@@ -1,6 +1,8 @@
 import { Route, Routes } from 'react-router-dom'
 // ClientEntryPage é a página pública de entrada do cliente na fila.
 import ClientEntryPage from './pages/ClientEntryPage'
+// LandingPage é a nova tela inicial pública com hero e painel ao vivo.
+import LandingPage from './pages/LandingPage'
 import OtpVerificationPage from './pages/OtpVerificationPage'
 // LoginPage é a página onde o barbeiro informa usuário e senha.
 import LoginPage from './pages/LoginPage'
@@ -17,8 +19,8 @@ export default function App() {
   return (
     // Routes envolve todas as rotas e renderiza apenas a que combinar com a URL atual.
     <Routes>
-      {/* Rota raiz pública: mostra a entrada do cliente. */}
-      <Route path="/" element={<ClientEntryPage />} />
+      {/* Rota raiz pública: mostra a nova landing com hero e painel ao vivo. */}
+      <Route path="/" element={<LandingPage />} />
       {/* Rota /entrada pública: alternativa explícita para a entrada do cliente. */}
       <Route path="/entrada" element={<ClientEntryPage />} />
       {/* Rota /verificar pública: tela para confirmar OTP via WhatsApp */}
