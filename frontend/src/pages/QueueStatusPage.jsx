@@ -108,7 +108,7 @@ export default function QueueStatusPage() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden px-4 py-8 text-[var(--foreground)]"
+      className="relative min-h-screen overflow-x-hidden px-4 py-6 text-[var(--foreground)] sm:py-8"
       style={{ background: 'var(--gradient-dark)' }}
     >
       {/* Luz de fundo vermelha e escurecimento nas bordas para manter a mesma camada visual da página inicial */}
@@ -117,19 +117,19 @@ export default function QueueStatusPage() {
       <div className="absolute left-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
       <div className="absolute right-0 top-0 h-full w-1" style={{ background: 'var(--gradient-wine)' }} />
 
-      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-2xl flex-col justify-center">
-        <header className="mb-7 flex flex-col items-center gap-3 text-center">
+      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-2xl flex-col justify-center sm:min-h-[calc(100vh-4rem)]">
+        <header className="mb-5 flex flex-col items-center gap-2 text-center sm:mb-7 sm:gap-3">
           <img
             src={nextCutLogo}
             alt="Logo NextCut"
-            className="h-36 w-36 object-contain sm:h-44 sm:w-44"
+            className="h-28 w-28 object-contain sm:h-44 sm:w-44"
             style={{ filter: 'drop-shadow(var(--shadow-wine))' }}
           />
-          <p className="font-sans text-xs uppercase tracking-[0.35em] text-[var(--wine-glow)]">Acompanhe sua vez</p>
+          <p className="font-sans text-[11px] uppercase tracking-[0.24em] text-[var(--wine-glow)] sm:text-xs sm:tracking-[0.35em]">Acompanhe sua vez</p>
         </header>
 
         <section
-          className="w-full rounded-2xl border p-6 shadow-2xl backdrop-blur-sm sm:p-8"
+          className="w-full rounded-2xl border p-5 shadow-2xl backdrop-blur-sm sm:p-8"
           style={{
             background: 'oklch(0.16 0.01 20 / 0.7)',
             borderColor: 'oklch(0.42 0.14 17 / 0.3)',
@@ -137,21 +137,21 @@ export default function QueueStatusPage() {
           }}
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h1 className="text-xl font-medium text-[var(--foreground)]" style={{ fontFamily: 'var(--font-display)' }}>
+            <div className="min-w-0">
+              <h1 className="break-words text-xl font-medium text-[var(--foreground)]" style={{ fontFamily: 'var(--font-display)' }}>
                 {queueEntry?.clientName ? `Olá, ${queueEntry.clientName} - Status da fila` : 'Status da fila'}
               </h1>
 
-              <div className="mt-2 flex items-center gap-2 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
-                <Phone className="h-4 w-4 text-[var(--wine-glow)]" />
-                <span>{phone || 'Telefone nao informado'}</span>
+              <div className="mt-2 flex min-w-0 items-center gap-2 text-sm" style={{ color: 'oklch(0.65 0.01 20)' }}>
+                <Phone className="h-4 w-4 flex-none text-[var(--wine-glow)]" />
+                <span className="min-w-0 break-words">{phone || 'Telefone nao informado'}</span>
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => navigate('/entrada')}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[oklch(0.22_0.01_20_/_0.8)]"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold text-[var(--foreground)] transition-colors hover:bg-[oklch(0.22_0.01_20_/_0.8)]"
               style={{ background: 'oklch(0.18 0.01 20 / 0.6)', borderColor: 'oklch(0.42 0.14 17 / 0.45)' }}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -177,8 +177,8 @@ export default function QueueStatusPage() {
             <QueueStatusSkeleton />
           ) : (
             queueEntry?.status === 'IN_SERVICE' ? (
-              <div className="mt-8 rounded-xl p-6 text-center shadow-[var(--shadow-wine)] transition-all" style={{ background: 'var(--gradient-wine)' }}>
-                <h2 className="text-2xl font-bold uppercase tracking-widest text-white">Chegou sua vez!</h2>
+              <div className="mt-8 rounded-xl p-5 text-center shadow-[var(--shadow-wine)] transition-all sm:p-6" style={{ background: 'var(--gradient-wine)' }}>
+                <h2 className="text-xl font-bold uppercase tracking-widest text-white sm:text-2xl">Chegou sua vez!</h2>
                 <p className="mt-2 text-sm text-stone-200">
                   O barbeiro já está te aguardando na cadeira.
                 </p>

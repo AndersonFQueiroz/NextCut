@@ -40,20 +40,19 @@ export function LoginPage() {
   } // Fecha a função handleSubmit.
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10 text-stone-100" style={{ background: '#0a0a0a' }}> {/* Usa o preto base solicitado para receber as vinhetas radiais. */}
-      {/* Vinheta vermelha nas bordas — luz emana dos cantos para o centro */}
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at top left, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom right, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at bottom left, rgba(80,5,15,0.5) 0%, transparent 40%)' }} />
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-x-hidden px-4 py-6 text-stone-100 sm:py-10" style={{ background: '#0a0a0a' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at top left, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at bottom right, rgba(120,10,25,0.7) 0%, transparent 50%)' }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at bottom left, rgba(80,5,15,0.5) 0%, transparent 40%)' }} />
 
       <div className="relative z-10 w-full max-w-[460px]">
-        <header className="mb-8 flex flex-col items-center text-center">
-          <img src={nextCutLogo} alt="Logo NextCut" className="h-48 w-48 object-contain" />
-          <p className="mb-2 text-[10px] font-semibold tracking-[0.4em] text-stone-300">sua vez, sem espera.</p>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-red-600">Painel do barbeiro</p>
+        <header className="mb-6 flex flex-col items-center text-center sm:mb-8">
+          <img src={nextCutLogo} alt="Logo NextCut" className="h-36 w-36 object-contain sm:h-48 sm:w-48" />
+          <p className="mb-2 text-[10px] font-semibold tracking-[0.28em] text-stone-300 sm:tracking-[0.4em]">sua vez, sem espera.</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-red-600 sm:tracking-[0.4em]">Painel do barbeiro</p>
         </header>
 
-        <form onSubmit={handleSubmit} className="rounded-xl border border-[#8f1728] bg-[#111111] p-6 shadow-[0_0_22px_rgba(143,23,40,0.42),0_0_72px_rgba(120,18,34,0.38)]">
+        <form onSubmit={handleSubmit} className="rounded-xl border border-[#8f1728] bg-[#111111] p-5 shadow-[0_0_22px_rgba(143,23,40,0.42),0_0_72px_rgba(120,18,34,0.38)] sm:p-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#7a1520]">
               <CalendarCheck className="h-5 w-5 text-stone-100" />
@@ -100,12 +99,12 @@ export function LoginPage() {
             </label>
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-4 text-sm text-stone-400">
-            <label className="flex cursor-pointer items-center gap-2">
+          <div className="mt-5 flex flex-col items-start gap-3 text-sm text-stone-400 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <label className="flex min-h-11 cursor-pointer items-center gap-2">
               <input type="checkbox" className="h-4 w-4 rounded border-[#333] bg-[#1e1e1e] accent-[#7a1520]" />
               <span>Manter conectado</span>
             </label>
-            <a href="#" className="text-red-600 hover:text-stone-100">
+            <a href="#" className="inline-flex min-h-11 items-center text-red-600 hover:text-stone-100">
               Esqueci minha senha
             </a>
           </div>
