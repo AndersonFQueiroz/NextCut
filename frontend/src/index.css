@@ -30,7 +30,7 @@ body::after {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url('./assets/4.png');
+  background-image: url('./assets/background-watermark.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
