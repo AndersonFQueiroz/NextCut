@@ -23,6 +23,21 @@ body {
   background: var(--background);
 }
 
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('./assets/fundo.jpg');
+  background-repeat: repeat;
+  background-size: auto;
+  opacity: 0.08; /* Deixa translúcido combinando com as cores */
+  pointer-events: none; /* Não bloqueia interações (menus, botões) */
+  z-index: 9999; /* Sobrepõe suavemente os fundos das páginas e não é afetado pelo scroll */
+}
+
 button:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--wine-glow);
