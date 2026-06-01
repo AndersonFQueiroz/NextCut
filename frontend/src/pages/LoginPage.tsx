@@ -48,7 +48,7 @@ export function LoginPage() {
       <div className="relative z-10 w-full max-w-[460px]">
         <header className="mb-6 flex flex-col items-center text-center sm:mb-8">
           <img src={nextCutLogo} alt="Logo NextCut" className="h-36 w-36 object-contain sm:h-48 sm:w-48" />
-          <p className="mb-2 text-[10px] font-semibold tracking-[0.28em] text-stone-300 sm:tracking-[0.4em]">sua vez, sem espera.</p>
+          <p className="mb-2 text-[10px] font-semibold tracking-[0.28em] text-stone-300 sm:tracking-[0.4em]">—— SUA VEZ. SEM ESPERA ——.</p>
           <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-red-600 sm:tracking-[0.4em]">Painel do barbeiro</p>
         </header>
 

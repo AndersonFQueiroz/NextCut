@@ -175,7 +175,7 @@ export default function LandingPage() {
             {/* Nome da marca no padrão solicitado. */}
             <span className="text-2xl font-bold tracking-widest text-white" style={{ fontFamily: 'var(--font-display)' }}>NEXTCUT</span>
             {/* Assinatura da marca ao lado do nome principal na navbar. */}
-            <span className="ml-3 text-sm font-display tracking-widest text-[var(--wine-glow)]"> | SUA VEZ, SEM ESPERAR.</span>
+            <span className="ml-3 text-sm font-display tracking-widest text-[var(--wine-glow)]"> | SUA VEZ. SEM ESPERA.</span>
           </button>
         </div>
         {/* Faixa vermelha listrada abaixo da navbar. */}

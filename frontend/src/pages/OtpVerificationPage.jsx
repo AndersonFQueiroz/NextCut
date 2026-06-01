@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, Loader2, MessageSquare } from 'lucide-react'
-import api from '../services/api'
 import nextCutLogo from '../assets/nextcut-logo.png'
 
 /**
