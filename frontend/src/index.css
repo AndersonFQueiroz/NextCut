@@ -35,7 +35,7 @@ body::after {
   background-size: auto;
   opacity: 0.08; /* Deixa translúcido combinando com as cores */
   pointer-events: none; /* Não bloqueia interações (menus, botões) */
-  z-index: 9999; /* Sobrepõe suavemente os fundos das páginas e não é afetado pelo scroll */
+  z-index: 0; /* Fica entre o fundo base das páginas e os conteúdos (textos/botões) */
 }
 
 button:focus-visible,
